@@ -1,0 +1,24 @@
+.venv/
+.packages/
+.test-artifacts/
+.spark-support/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.vscode/
+
+# Large/raw data files
+data/raw/*.csv
+data/processed/
+data/demo/*.csv
+models/sentiment_lr/data/
+tmp/
+
+# Keep documentation and output artifacts
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!models/.gitkeep
+!outputs/
+!outputs/**
+
