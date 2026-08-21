@@ -1,0 +1,43 @@
+{
+  "source": "hdfs://localhost:8020/twitter/raw/sentiment140.csv",
+  "encoding": "ISO-8859-1",
+  "expected_columns": [
+    "target",
+    "id",
+    "date",
+    "flag",
+    "user",
+    "text"
+  ],
+  "raw_rows": 1600000,
+  "clean_rows": 1595145,
+  "removed_rows": 4855,
+  "label_counts_raw": {
+    "0": 800000,
+    "4": 800000
+  },
+  "label_counts_clean": {
+    "0": 798387,
+    "1": 796758
+  },
+  "missing_counts": {
+    "target": 0,
+    "id": 0,
+    "date": 0,
+    "flag": 0,
+    "user": 0,
+    "text": 0
+  },
+  "duplicate_id_rows_removed": 1685,
+  "empty_text_rows": 0,
+  "invalid_target_rows": 0,
+  "invalid_date_rows": 0,
+  "date_parse_success_rate": 1.0,
+  "min_posted_at_utc": "2009-04-07 12:19:45",
+  "max_posted_at_utc": "2009-06-26 00:28:31",
+  "notes": [
+    "Duplicate IDs are removed only from the cleaned analysis data.",
+    "Rows with invalid dates remain available for sentiment modeling.",
+    "The target distribution describes the dataset construction, not public opinion."
+  ]
+}
