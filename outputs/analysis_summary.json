@@ -1,0 +1,9 @@
+{
+  "analyzed_rows": 1595145,
+  "distinct_accounts_in_sample": 658917,
+  "days_with_valid_timestamps": 80,
+  "hours_with_posts_utc": 24,
+  "sql_query": "Count posts by UTC date and dataset label using the temporary view 'tweets'.",
+  "top_word_method": "Token occurrence counts after display-only stopword filtering; negations are retained.",
+  "interpretation_limit": "All results describe the analyzed dataset sample, not all Twitter users."
+}
