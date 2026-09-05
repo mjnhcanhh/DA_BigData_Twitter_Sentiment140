@@ -1,0 +1,10 @@
+{
+  "model_path": "models\\sentiment_lr",
+  "selected_reg_param": 0.1,
+  "validation_macro_f1": 0.7522030677395772,
+  "label_mapping": {
+    "0": "negative",
+    "1": "positive"
+  },
+  "synthetic_or_real_data": "Determined by the input path recorded in outputs/data_quality.json."
+}

@@ -1,0 +1,4 @@
+﻿model,reg_param,validation_macro_f1,fit_seconds
+tfidf_logistic_regression,0.01,0.7363052805882453,12.223932900000136
+tfidf_logistic_regression,0.1,0.7522030677395772,7.233460800000103
+tfidf_naive_bayes,,0.724369244786205,3.6972415000000183

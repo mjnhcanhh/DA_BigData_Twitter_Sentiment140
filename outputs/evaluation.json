@@ -1,0 +1,155 @@
+{
+  "data": {
+    "conflicting_text_groups_removed": 2361,
+    "conflicting_source_rows_removed": 29280,
+    "sample_fraction": 0.1,
+    "split_rule": "pmod(xxhash64(clean_text), 1000): train <700, validation 700-849, test >=850",
+    "split_label_counts": {
+      "train": {
+        "0": 53218,
+        "1": 52991
+      },
+      "validation": {
+        "0": 11406,
+        "1": 11420
+      },
+      "test": {
+        "0": 11517,
+        "1": 11295
+      }
+    }
+  },
+  "feature_pipeline": {
+    "steps": [
+      "RegexTokenizer",
+      "HashingTF",
+      "IDF",
+      "classifier"
+    ],
+    "num_features": 32768,
+    "stopwords_removed_for_model": false,
+    "note": "Only clean_text is used as model input; user, target and label are not features."
+  },
+  "validation": [
+    {
+      "model": "tfidf_logistic_regression",
+      "reg_param": 0.01,
+      "validation_macro_f1": 0.7363052805882453,
+      "fit_seconds": 12.223932900000136
+    },
+    {
+      "model": "tfidf_logistic_regression",
+      "reg_param": 0.1,
+      "validation_macro_f1": 0.7522030677395772,
+      "fit_seconds": 7.233460800000103
+    },
+    {
+      "model": "tfidf_naive_bayes",
+      "reg_param": "",
+      "validation_macro_f1": 0.724369244786205,
+      "fit_seconds": 3.6972415000000183
+    }
+  ],
+  "test_results": {
+    "majority_class_baseline": {
+      "rows": 22812,
+      "accuracy": 0.5048658600736454,
+      "per_class": {
+        "0": {
+          "precision": 0.5048658600736454,
+          "recall": 1.0,
+          "f1": 0.6709778904133532,
+          "support": 11517
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11295
+        }
+      },
+      "macro_f1": 0.3354889452066766,
+      "weighted_f1": 0.3387538297339378,
+      "confusion_matrix": [
+        [
+          11517,
+          0
+        ],
+        [
+          11295,
+          0
+        ]
+      ],
+      "confusion_matrix_orientation": "rows=actual [negative, positive], columns=predicted [negative, positive]",
+      "majority_label_from_train": 0
+    },
+    "tfidf_logistic_regression": {
+      "rows": 22812,
+      "accuracy": 0.7474574785200772,
+      "per_class": {
+        "0": {
+          "precision": 0.7575621979595489,
+          "recall": 0.7350004341408353,
+          "f1": 0.7461107928253493,
+          "support": 11517
+        },
+        "1": {
+          "precision": 0.7377556281147963,
+          "recall": 0.7601593625498008,
+          "f1": 0.7487899533423451,
+          "support": 11295
+        }
+      },
+      "macro_f1": 0.7474503730838472,
+      "weighted_f1": 0.7474373366636566,
+      "confusion_matrix": [
+        [
+          8465,
+          3052
+        ],
+        [
+          2709,
+          8586
+        ]
+      ],
+      "confusion_matrix_orientation": "rows=actual [negative, positive], columns=predicted [negative, positive]",
+      "prediction_seconds": 1.0615730000001804,
+      "selected_reg_param": 0.1,
+      "selection_metric": "validation_macro_f1"
+    },
+    "tfidf_naive_bayes": {
+      "rows": 22812,
+      "accuracy": 0.716903384183763,
+      "per_class": {
+        "0": {
+          "precision": 0.7162890123984609,
+          "recall": 0.7273595554397847,
+          "f1": 0.721781836980872,
+          "support": 11517
+        },
+        "1": {
+          "precision": 0.7175496986597103,
+          "recall": 0.7062416998671979,
+          "f1": 0.7118507942173835,
+          "support": 11295
+        }
+      },
+      "macro_f1": 0.7168163155991277,
+      "weighted_f1": 0.7168646386636002,
+      "confusion_matrix": [
+        [
+          8377,
+          3140
+        ],
+        [
+          3318,
+          7977
+        ]
+      ],
+      "confusion_matrix_orientation": "rows=actual [negative, positive], columns=predicted [negative, positive]",
+      "prediction_seconds": 0.6032998999999108,
+      "smoothing": 1.0
+    }
+  },
+  "test_policy": "Test was evaluated only after selecting Logistic Regression regularization on validation."
+}

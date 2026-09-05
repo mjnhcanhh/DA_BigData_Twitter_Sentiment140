@@ -1,0 +1,74 @@
+{
+  "scope": "Daily groupBy aggregation action; input read and sample creation are excluded.",
+  "repetitions": 3,
+  "seed": 42,
+  "total_processed_rows": 1595145,
+  "results": [
+    {
+      "requested_rows": "100000",
+      "actual_rows": 100013,
+      "mode": "uncached",
+      "runs_seconds": [
+        0.2821303999999145,
+        0.1422978000000512,
+        0.12461019999977907
+      ],
+      "median_seconds": 0.1422978000000512
+    },
+    {
+      "requested_rows": "100000",
+      "actual_rows": 100013,
+      "mode": "cached",
+      "runs_seconds": [
+        0.16923369999994975,
+        0.11804019999999582,
+        0.1119684000000234
+      ],
+      "median_seconds": 0.11804019999999582
+    },
+    {
+      "requested_rows": "500000",
+      "actual_rows": 501068,
+      "mode": "uncached",
+      "runs_seconds": [
+        0.20453709999992498,
+        0.15753619999986768,
+        0.15954450000003817
+      ],
+      "median_seconds": 0.15954450000003817
+    },
+    {
+      "requested_rows": "500000",
+      "actual_rows": 501068,
+      "mode": "cached",
+      "runs_seconds": [
+        0.19049839999979667,
+        0.15976409999984753,
+        0.12798639999982697
+      ],
+      "median_seconds": 0.15976409999984753
+    },
+    {
+      "requested_rows": "all",
+      "actual_rows": 1595145,
+      "mode": "uncached",
+      "runs_seconds": [
+        0.4054097000000638,
+        0.13865179999993416,
+        0.17722639999988132
+      ],
+      "median_seconds": 0.17722639999988132
+    },
+    {
+      "requested_rows": "all",
+      "actual_rows": 1595145,
+      "mode": "cached",
+      "runs_seconds": [
+        0.15002930000014203,
+        0.14166679999993903,
+        0.171407199999976
+      ],
+      "median_seconds": 0.15002930000014203
+    }
+  ]
+}
