@@ -102,7 +102,7 @@ def main():
         # Header & Footer
         header = section.header
         hp = header.paragraphs[0]
-        hp.text = "Báo cáo Tiến độ Đồ án Big Data — Nhóm 9"
+        hp.text = "Báo cáo Cuối kỳ Đồ án Big Data — Nhóm 09"
         hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         hp.runs[0].font.name = "Arial"
         hp.runs[0].font.size = Pt(8.5)
@@ -136,7 +136,7 @@ def main():
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_title.paragraph_format.space_before = Pt(18)
     p_title.paragraph_format.space_after = Pt(4)
-    r_title = p_title.add_run("BÁO CÁO TIẾN ĐỘ THỰC HIỆN ĐỒ ÁN BIG DATA")
+    r_title = p_title.add_run("BÁO CÁO CUỐI KỲ — ĐỒ ÁN MÔN NHẬP MÔN BIG DATA")
     r_title.bold = True
     r_title.font.size = Pt(18)
     r_title.font.color.rgb = RGBColor(0x1F, 0x4E, 0x79)
@@ -317,6 +317,17 @@ def main():
 
     doc.add_paragraph().paragraph_format.space_after = Pt(4)
 
+    add_h2("3.3. Lý giải kỹ thuật về việc không sử dụng Apache Kafka trong bài toán Batch")
+    doc.add_paragraph(
+        "Theo yêu cầu của đề tài: 'Với dữ liệu streaming/thu thập liên tục, sử dụng Kafka để truyền dữ liệu rồi lưu vào HDFS. "
+        "Với bài toán batch, có thể không dùng Kafka nhưng phải giải thích hợp lý'. Nhóm nghiên cứu đưa ra 5 luận điểm kỹ thuật sau:\n"
+        "1. Bản chất dữ liệu: Sentiment140 là tập dữ liệu lịch sử tĩnh (1.6 triệu dòng đã trọn vẹn), phục vụ mục đích phân tích hồi quy và huấn luyện offline; việc xử lý theo lô (batch) nạp trực tiếp vào HDFS là tối ưu và tự nhiên nhất.\n"
+        "2. Bảo toàn toàn vẹn dữ liệu: Đọc nạp trực tiếp theo khối 128 MiB vào HDFS bảo đảm 100% không thất thoát dữ liệu, tránh độ phức tạp quản lý offset message queue.\n"
+        "3. Tiết kiệm tài nguyên: Giảm tải tài nguyên hệ thống lab bằng cách không phải duy trì cụm Kafka Broker và ZooKeeper/KRaft (tiết kiệm 2-4 GB RAM), nhường bộ nhớ cho JVM của Spark.\n"
+        "4. Tối ưu thông lượng và I/O: Tránh độ trễ nhân đôi (Producer đẩy vào Kafka Topic -> Broker ghi đĩa -> Consumer đọc ghi HDFS).\n"
+        "5. Thiết kế sẵn sàng mở rộng (Lambda Architecture): Hệ thống hiện tại hoàn thành xuất sắc vai trò Batch Layer; kiến trúc được module hóa sẵn sàng tích hợp Kafka làm Speed Layer khi kết nối Twitter Live Streaming."
+    )
+
     # ------------------ PHẦN 4 ------------------
     add_h1("4. CÁC THÀNH PHẦN ĐÃ TRIỂN KHAI VÀ HOẠT ĐỘNG THỰC TẾ")
 
@@ -360,6 +371,16 @@ def main():
         "• Bấm nút chạy các bước độc lập (Prepare, Analyze, Train, Benchmark, Storage Compare) hoặc chạy toàn bộ (Run All).\n"
         "• Hiển thị cửa sổ Console Log trực tiếp thời gian thực.\n"
         "• Ô kiểm thử suy luận cảm xúc trực tiếp: Người dùng gõ câu tweet tiếng Anh bất kỳ và nhận ngay kết quả dự đoán (Tích cực/Tiêu cực kèm thanh xác suất %)."
+    )
+
+    add_h2("4.6. Phân hệ Điều phối tự động bằng Apache Airflow DAG")
+    doc.add_paragraph(
+        "Nhóm đã xây dựng hoàn chỉnh đồ thị tuần hoàn có hướng (DAG) twitter_sentiment140_bigdata_pipeline "
+        "(định nghĩa trong dags/twitter_sentiment_pipeline_dag.py) điều phối tự động chuỗi 9 tác vụ:\n"
+        "• start_pipeline -> check_raw_data -> check_hdfs_status -> upload_raw_to_hdfs -> spark_prepare_clean -> "
+        "[spark_analysis_sql, spark_train_evaluate] -> verify_manifest_artifacts -> end_pipeline.\n"
+        "• Cơ chế tự phục hồi: Cấu hình retries = 1, retry_delay = 2 phút, đảm bảo tính tái lập (Reproducibility) và toàn vẹn pipeline.\n"
+        "• Nhật ký minh chứng: Quá trình điều phối được ghi vết chi tiết vào outputs/logs/airflow_dag_run.log."
     )
 
     # ------------------ PHẦN 5 ------------------
@@ -429,6 +450,7 @@ def main():
         ("posts_by_hour_utc.png", "Hình 5.3. Mật độ phân bố số lượng tweet theo 24 khung giờ trong ngày (Giờ UTC)."),
         ("top_words_by_label.png", "Hình 5.4. Top các từ vựng đặc trưng phân hóa mạnh nhất giữa hai nhóm nhãn cảm xúc."),
         ("performance.png", "Hình 5.5. Biểu đồ hiệu năng thực nghiệm: Tăng tốc độ truy vấn khi sử dụng Spark Cache."),
+        ("gui_dashboard.png", "Hình 5.6. Giao diện Desktop Dashboard điều phối, thực thi và theo dõi log hệ thống."),
     ]
     for img_name, caption in image_list:
         img_path = charts_dir / img_name
@@ -543,7 +565,7 @@ def main():
     # Save
     out_dir = Path("report")
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_file = out_dir / "Bao_Cao_Tien_Do_BigData_Nhom9.docx"
+    out_file = out_dir / "BaoCaoCuoiKy_BigData_Nhom9.docx"
     doc.save(str(out_file))
     print(f"Generated DOCX successfully at: {out_file.resolve()}")
 
