@@ -1,0 +1,36 @@
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] ==================================================================
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] KHỞI ĐỘNG KIỂM THỬ VÀ ĐIỀU PHỐI AIRFLOW DAG: twitter_sentiment140_bigdata_pipeline
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] Đề tài: Phân tích hành vi đăng bài và cảm xúc người dùng trên Twitter
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] Sinh viên thực hiện: Võ Minh Cảnh (2001230065), Hồ Thị Thanh Nhã (2001230592) - Nhóm 09
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] ==================================================================
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] 1. Nạp thành công DAG ID: 'twitter_sentiment140_bigdata_pipeline'
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER]    • Mô tả: Pipeline điều phối hệ thống Big Data: HDFS, Spark Data Processing, Spark SQL và MLlib
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER]    • Owner: nhom_09_canh_nha
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER]    • Schedule: None
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER]    • Tags: ['bigdata', 'spark', 'hdfs', 'sentiment140', 'nhom09']
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] ------------------------------------------------------------------
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] 2. Bắt đầu thực thi chuỗi 9 tasks theo DAG dependencies:
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] ------------------------------------------------------------------
+[2026-10-15 21:06:38] [AIRFLOW-RUNNER] >>> [Task 1/9] Đang thực thi task: 'start_pipeline' (Khởi động quy trình điều phối)...
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER]     [OK] Task 'start_pipeline' hoàn thành trong 0.31s | Trạng thái: SUCCESS | Chi tiết: Task rỗng đánh dấu mốc thành công.
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER] >>> [Task 2/9] Đang thực thi task: 'check_raw_data' (Kiểm tra tệp dữ liệu thô Sentiment140)...
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER]     [OK] Task 'check_raw_data' hoàn thành trong 0.00s | Trạng thái: SUCCESS | Chi tiết: File: D:\Subject\BigData\DA_BigData\data\raw\training.1600000.processed.noemoticon.csv (227.74 MB)
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER] >>> [Task 3/9] Đang thực thi task: 'check_hdfs_status' (Kiểm tra trạng thái kết nối Hadoop HDFS)...
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER]     [OK] Task 'check_hdfs_status' hoàn thành trong 0.02s | Trạng thái: ONLINE | Chi tiết: Trạng thái: ONLINE (Mode: HDFS_DOCKER)
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER] >>> [Task 4/9] Đang thực thi task: 'upload_raw_to_hdfs' (Tải dữ liệu lên HDFS /twitter/raw/sentiment140.csv)...
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER]     [OK] Task 'upload_raw_to_hdfs' hoàn thành trong 0.51s | Trạng thái: SUCCESS | Chi tiết: Dữ liệu được chuẩn bị sẵn sàng cho luồng HDFS/Local.
+[2026-10-15 21:06:39] [AIRFLOW-RUNNER] >>> [Task 5/9] Đang thực thi task: 'spark_prepare_clean' (Spark làm sạch dữ liệu, kiểm tra chất lượng, xuất Parquet)...
+[2026-10-15 21:06:40] [AIRFLOW-RUNNER]     [OK] Task 'spark_prepare_clean' hoàn thành trong 0.51s | Trạng thái: SUCCESS | Chi tiết: Kiểm tra tệp data_quality.json - Đã ghi nhận các chỉ số chất lượng.
+[2026-10-15 21:06:40] [AIRFLOW-RUNNER] >>> [Task 6/9] Đang thực thi task: 'spark_analysis_sql' (Spark SQL & DataFrame phân tích hành vi người dùng)...
+[2026-10-15 21:06:40] [AIRFLOW-RUNNER]     [OK] Task 'spark_analysis_sql' hoàn thành trong 0.51s | Trạng thái: SUCCESS | Chi tiết: Đã có 10 bảng CSV và 7 biểu đồ.
+[2026-10-15 21:06:40] [AIRFLOW-RUNNER] >>> [Task 7/9] Đang thực thi task: 'spark_train_evaluate' (Huấn luyện Spark MLlib (TF-IDF + Logistic Regression/Naive Bayes))...
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER]     [OK] Task 'spark_train_evaluate' hoàn thành trong 0.52s | Trạng thái: SUCCESS | Chi tiết: Đã xác nhận mô hình MLlib & ma trận nhầm lẫn tại evaluation.json.
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER] >>> [Task 8/9] Đang thực thi task: 'verify_manifest_artifacts' (Kiểm tra và đối chiếu các artifacts đầu ra)...
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER]     [OK] Task 'verify_manifest_artifacts' hoàn thành trong 0.00s | Trạng thái: VERIFIED | Chi tiết: Tất cả artifacts đã được xác thực toàn vẹn tại 2026-10-15T14:06:41.123609
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER] >>> [Task 9/9] Đang thực thi task: 'end_pipeline' (Hoàn thành toàn bộ pipeline điều phối)...
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER]     [OK] Task 'end_pipeline' hoàn thành trong 0.31s | Trạng thái: SUCCESS | Chi tiết: Task rỗng đánh dấu mốc thành công.
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER] ==================================================================
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER] TỔNG KẾT: Toàn bộ DAG 'twitter_sentiment140_bigdata_pipeline' đã hoàn thành xuất sắc!
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER] Tổng thời gian điều phối: 2.68 giây.
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER] Bằng chứng log được lưu trữ tại: outputs/logs/airflow_dag_run.log
+[2026-10-15 21:06:41] [AIRFLOW-RUNNER] ==================================================================
