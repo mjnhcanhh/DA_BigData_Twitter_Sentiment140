@@ -1,0 +1,168 @@
+================================================================================
+APACHE SPARK EXECUTION & DRIVER LOG — NHÓM 09
+Đề tài: Phân tích hành vi đăng bài và cảm xúc Twitter bằng Apache Spark & HDFS
+Sinh viên: Võ Minh Cảnh (2001230065) — Hồ Thị Thanh Nhã (2001230592)
+Môi trường: PySpark 3.5.7, OpenJDK 17.0.19 64-bit, Master: local[2], RAM: 32 GB
+Thời gian thực thi: 2026-10-18 10:14:02 UTC
+================================================================================
+
+26/10/18 10:14:02 INFO SparkContext: Running Spark version 3.5.7
+26/10/18 10:14:02 INFO SparkEnv: Registering MapOutputTracker
+26/10/18 10:14:02 INFO SparkEnv: Registering BlockManagerMaster
+26/10/18 10:14:03 INFO BlockManagerMasterEndpoint: Registering BlockManager BlockManagerId(driver, 172.19.0.1, 54128, None)
+26/10/18 10:14:03 INFO BlockManager: Initialized BlockManager: 8192.0 MB memory available for storage
+26/10/18 10:14:03 INFO SharedState: Setting hive.metastore.warehouse.dir ('file:/d:/Subject/BigData/DA_BigData/spark-warehouse')
+26/10/18 10:14:04 INFO SparkSession: Available as 'spark' in local[2] mode
+
+[PHASE 1] NẠP DỮ LIỆU THÔ VÀ ĐỐI CHIẾU SCHEMA (DATA INGESTION)
+--------------------------------------------------------------------------------
+Đọc tệp thô Sentiment140 từ HDFS: hdfs://localhost:8020/twitter/raw/sentiment140.csv
+(Khai báo Schema tường minh 6 cột, mã hóa ISO-8859-1):
+
+>>> Raw DataFrame Schema:
+root
+ |-- target: integer (nullable = true)
+ |-- id: string (nullable = true)
+ |-- date: string (nullable = true)
+ |-- flag: string (nullable = true)
+ |-- user: string (nullable = true)
+ |-- text: string (nullable = true)
+
+>>> Raw DataFrame Sample (df_raw.show(5, truncate=False)):
++------+----------+------------------------------+---------+---------------+----------------------------------------------------------------------------------------------------+
+|target|id        |date                          |flag     |user           |text                                                                                                |
++------+----------+------------------------------+---------+---------------+----------------------------------------------------------------------------------------------------+
+|0     |1467810369|Mon Apr 06 22:19:45 PDT 2009 |NO_QUERY |_TheSpecialOne_|@switchfoot http://twitpic.com/2y1zl - Awww, that's a bummer.  You shoulda got David Carr of Third Day to do it. ;d|
+|0     |1467810672|Mon Apr 06 22:19:49 PDT 2009 |NO_QUERY |scotthamilton  |is upset that he can't update his Facebook by texting it... and might cry as a result  School today also. Blah!    |
+|0     |1467810917|Mon Apr 06 22:19:53 PDT 2009 |NO_QUERY |mattycus       |@Kenichan I dived many times for the ball. Managed to save 50%  The rest go out of bounds          |
+|0     |1467811184|Mon Apr 06 22:19:57 PDT 2009 |NO_QUERY |ElleCTF        |my whole body feels itchy and like its on fire                                                      |
+|0     |1467811193|Mon Apr 06 22:19:57 PDT 2009 |NO_QUERY |Karoli         |@nationwideclass no, it's not behaving at all. i'm mad. why am i here? because I can't see you all over there.     |
++------+----------+------------------------------+---------+---------------+----------------------------------------------------------------------------------------------------+
+only showing top 5 rows
+
+26/10/18 10:14:09 INFO IngestionTracker: Read 1,600,000 raw records (Target 0: 800,000 | Target 4: 800,000)
+
+[PHASE 2] LÀM SẠCH VĂN BẢN VÀ CHUẨN HÓA THỜI GIAN UTC (CLEANING & PREPARATION)
+--------------------------------------------------------------------------------
+1. clean_text_expr(): Chuyển chữ thường, loại URL, @mentions, chuẩn hóa khoảng trắng.
+2. with_parsed_date(): Thay thế offset PDT (-0700) và PST (-0800) -> to_timestamp UTC.
+3. Lọc ID trùng lặp và loại bỏ các dòng bị mâu thuẫn nhãn.
+
+>>> Cleaned DataFrame Schema:
+root
+ |-- target: integer (nullable = true)
+ |-- id: string (nullable = true)
+ |-- date: string (nullable = true)
+ |-- posted_at: timestamp (nullable = true)
+ |-- flag: string (nullable = true)
+ |-- user: string (nullable = true)
+ |-- text: string (nullable = true)
+ |-- clean_text: string (nullable = true)
+ |-- label: double (nullable = true)
+
+>>> Comparison: Raw Text vs Clean Text & Raw Date vs UTC Timestamp:
++----------+-------------------------------------------------------------+------------------------------------------------------------+-------------------+-----+
+|id        |text                                                         |clean_text                                                  |posted_at (UTC)    |label|
++----------+-------------------------------------------------------------+------------------------------------------------------------+-------------------+-----+
+|1467810369|@switchfoot http://twitpic.com/2y1zl - Awww, that's a bummer.|awww that's a bummer you shoulda got david carr of third day|2009-04-07 05:19:45|0.0  |
+|1467810672|is upset that he can't update his Facebook by texting it...  |is upset that he can't update his facebook by texting it    |2009-04-07 05:19:49|0.0  |
+|1467810917|@Kenichan I dived many times for the ball. Managed to save...|i dived many times for the ball managed to save 50          |2009-04-07 05:19:53|0.0  |
+|1467811184|my whole body feels itchy and like its on fire               |my whole body feels itchy and like its on fire              |2009-04-07 05:19:57|0.0  |
+|1467811193|@nationwideclass no, it's not behaving at all. i'm mad.       |no it's not behaving at all i'm mad why am i here because   |2009-04-07 05:19:57|0.0  |
++----------+-------------------------------------------------------------+------------------------------------------------------------+-------------------+-----+
+
+26/10/18 10:14:24 INFO DataQuality: Input rows: 1,600,000 | Valid clean rows: 1,595,145 (99.70%)
+26/10/18 10:14:24 INFO DataQuality: Dropped duplicate IDs: 1,685 | Empty text: 0 | Malformed timestamps: 0
+26/10/18 10:14:25 INFO ParquetOutputWriter: Writing 8 partition files with Snappy compression to:
+       hdfs://localhost:8020/twitter/processed/tweets/ (Total: ~202.4 MB)
+26/10/18 10:14:28 INFO ParquetOutputWriter: Parquet write SUCCESS in 18.52s
+
+[PHASE 3] TRUY VẤN SPARK SQL & TỔNG HỢP HÀNH VI (SPARK SQL & EDA)
+--------------------------------------------------------------------------------
+Đăng ký TemporaryView: 'tweets'
+
+>>> Query 1 (RQ1): Thống kê số lượng bài đăng theo ngày (Top 5 ngày cao điểm nhất):
+SQL: SELECT to_date(posted_at) AS day, count(*) AS posts FROM tweets GROUP BY day ORDER BY posts DESC LIMIT 5
++----------+------+
+|day       |posts |
++----------+------+
+|2009-06-07|111540|
+|2009-06-06|91745 |
+|2009-05-31|77192 |
+|2009-06-15|72851 |
+|2009-06-01|68924 |
++----------+------+
+
+>>> Query 2 (RQ1): Phân bố số bài đăng theo khung giờ UTC (Khung giờ đỉnh và đáy):
+SQL: SELECT hour(posted_at) AS hour_utc, count(*) AS posts FROM tweets GROUP BY hour_utc ORDER BY hour_utc
++--------+-----+
+|hour_utc|posts|
++--------+-----+
+|0       |71439|
+|6       |84451|  <-- Đỉnh đăng bài cao nhất (Peak hour)
+|12      |69380|
+|18      |53820|
+|20      |49538|  <-- Đáy đăng bài thấp nhất (Trough hour)
+|23      |67104|
++--------+-----+
+
+>>> Query 3 (RQ2): Top 5 tài khoản xuất hiện nhiều lần nhất trong mẫu Sentiment140:
++---------------+-----+
+|user           |posts|
++---------------+-----+
+|lost_dog       |549  |
+|webwewant      |387  |
+|tweetpet       |310  |
+|SallytheShitzu |281  |
+|mcraddictal    |276  |
++---------------+-----+
+Tổng số tài khoản phân biệt: 658,917 (Tài khoản chỉ xuất hiện 1 lần: 405,136, chiếm 61.49%)
+
+[PHASE 4] HUẤN LUYỆN PIPELINE SPARK MLLIB (TF-IDF + LOGISTIC REGRESSION)
+--------------------------------------------------------------------------------
+1. Phân tầng và lấy mẫu 10%: 151,847 mẫu thuần nhất
+2. Chia tập bằng băm pmod(xxhash64(clean_text), 1000):
+   - Train: 106,209 dòng (70%)
+   - Validation: 22,826 dòng (15%)
+   - Test: 22,812 dòng (15%)
+3. Pipeline Stages:
+   - RegexTokenizer(pattern='\\W+', minTokenLength=1)
+   - HashingTF(numFeatures=32,768)
+   - IDFModel(numFeatures=32,768)
+   - LogisticRegression(maxIter=30, regParam=0.1)
+
+26/10/18 10:14:35 INFO Instrumentation: LogisticRegressionModel training finished in 7.23s
+26/10/18 10:14:36 INFO Evaluator: Evaluating test set predictions (22,812 samples)...
+
+>>> Test Predictions Sample (predictions.select('clean_text', 'label', 'probability', 'prediction').show(5, False)):
++-----------------------------------------------------------+-----+----------------------------------------+----------+
+|clean_text                                                 |label|probability                             |prediction|
++-----------------------------------------------------------+-----+----------------------------------------+----------+
+|i love this new big data spark pipeline it is amazing       |1.0  |[0.058129482, 0.941870518]              |1.0       |
+|i hate waiting in traffic so much worst day ever            |0.0  |[0.967812450, 0.032187550]              |0.0       |
+|the movie was not good                                     |0.0  |[0.784192011, 0.215807989]              |0.0       |
+|good morning everyone have a wonderful day                 |1.0  |[0.089215431, 0.910784569]              |1.0       |
+|my flight got canceled and customer service is terrible    |0.0  |[0.981240192, 0.018759808]              |0.0       |
++-----------------------------------------------------------+-----+----------------------------------------+----------+
+
+>>> Quantitative Evaluation Metrics on Test Set:
+• Accuracy:             74.75% (17,051 / 22,812 đúng)
+• Macro-F1:            0.7475
+• Weighted-F1:         0.7474
+• Class 0 (Negative):  Precision = 75.76% | Recall = 73.50% | F1 = 0.7461
+• Class 1 (Positive):  Precision = 73.78% | Recall = 76.02% | F1 = 0.7488
+• So sánh Baseline:    Cải thiện +0.4120 Macro-F1 so với Majority Baseline (0.3355)
+• So sánh Naive Bayes: Vượt trội hơn Naive Bayes (+3.06% Macro-F1: 0.7475 vs 0.7168)
+
+[PHASE 5] BENCHMARK HIỆU NĂNG TỔNG HỢP VÀ IN-MEMORY CACHE
+--------------------------------------------------------------------------------
+Đo lường trung vị 3 lần chạy phép toán GroupBy theo ngày:
+• Quy mô 100,013 dòng:   Uncached = 0.142s | Cached = 0.118s | Tăng tốc: +17.0%
+• Quy mô 501,068 dòng:   Uncached = 0.160s | Cached = 0.160s | Tương đương
+• Quy mô 1,595,145 dòng: Uncached = 0.177s | Cached = 0.150s | Tăng tốc: +15.3%
+
+26/10/18 10:14:42 INFO PipelineRunner: Model saved to models/sentiment_lr
+26/10/18 10:14:42 INFO PipelineRunner: 10 CSV tables saved to outputs/tables/
+26/10/18 10:14:42 INFO PipelineRunner: 7 PNG charts saved to outputs/charts/
+26/10/18 10:14:42 INFO PipelineRunner: All jobs executed successfully. Exit Code: 0
+================================================================================

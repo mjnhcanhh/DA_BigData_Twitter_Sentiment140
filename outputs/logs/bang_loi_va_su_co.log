@@ -1,0 +1,152 @@
+================================================================================
+BẢNG THEO DÕI & XỬ LÝ LỖI KỸ THUẬT (BUG & INCIDENT LOG) — NHÓM 09
+Đề tài: Phân tích hành vi đăng bài và cảm xúc Twitter bằng Apache Spark & HDFS
+Nhóm thực hiện: Võ Minh Cảnh (2001230065) — Hồ Thị Thanh Nhã (2001230592)
+Dữ liệu kiểm thử: Stanford Sentiment140 (1.600.000 dòng, 238.8 MB)
+================================================================================
+
+[MÃ LỖI]: ERR-01-SPARK-OOM
+[HỆ THỐNG]: Apache Spark Driver / JVM Memory
+[MÔ TẢ TRIỆU CHỨNG]:
+  Khi thu thập dữ liệu 1.6M bản ghi hoặc gom nhóm văn bản lớn, JVM dừng đột ngột
+  ném ngoại lệ: `java.lang.OutOfMemoryError: Java heap space`.
+[NGUYÊN NHÂN GỐC RỄ]:
+  Cấu hình mặc định cấp phát JVM cho Spark Driver chỉ có 1 GB RAM. Dữ liệu thô
+  khi giải nén, token hóa và tạo mảng đặc trưng TF-IDF trong bộ nhớ heap vượt quá 3.2 GB.
+[GIẢI PHÁP KHẮC PHỤC]:
+  - Cấu hình Spark Session với:
+    spark.driver.memory = "4g"
+    spark.executor.memory = "4g"
+    spark.memory.fraction = "0.8"
+    spark.sql.shuffle.partitions = "8"
+  - Thay thế toàn bộ lệnh `.collect()` gom về driver bằng xử lý phân tán Spark DataFrame
+    và ghi trực tiếp xuống HDFS/Parquet.
+[KẾT QUẢ KIỂM CHỨNG]:
+  Hoàn thành nạp và xử lý 1.600.000 dòng trơn tru, driver duy trì ổn định mức RAM ~2.8 GB.
+[TRẠNG THÁI]: RESOLVED (Đã giải quyết 100%)
+
+--------------------------------------------------------------------------------
+
+[MÃ LỖI]: ERR-02-ENCODING-ISO
+[HỆ THỐNG]: Tầng Tiếp nhận Dữ liệu (Ingestion Layer) / PySpark CSV Reader
+[MÔ TẢ TRIỆU CHỨNG]:
+  Khi nạp tệp Sentiment140 CSV bằng PySpark, chương trình ném lỗi hoặc các ký tự đặc biệt,
+  dấu nháy đơn và tên người dùng bị lỗi font (mojibake), làm vỡ cấu trúc cột.
+[NGUYÊN NHÂN GỐC RỄ]:
+  Dataset Stanford Sentiment140 được thu thập từ năm 2009 sử dụng bảng mã ISO-8859-1
+  (Latin-1) thay vì chuẩn UTF-8 hiện đại. Trình phân tích CSV mặc định UTF-8 bị lỗi khi
+  gặp byte mã hóa từ 0x80 đến 0xFF.
+[GIẢI PHÁP KHẮC PHỤC]:
+  - Khai báo tường minh trong lệnh đọc Spark CSV:
+    spark.read.option("encoding", "ISO-8859-1").option("header", "false")
+  - Viết hàm `clean_text_expr` sử dụng biểu thức chính quy Spark SQL giải mã các thực thể
+    HTML (`&amp;` -> `&`, `&lt;` -> `<`) và loại bỏ ký tự rác trước khi huấn luyện.
+[KẾT QUẢ KIỂM CHỨNG]:
+  1.600.000 dòng được đọc chính xác 100%, không bị lệch cột, lọc sạch 1.685 dòng trùng lặp.
+[TRẠNG THÁI]: RESOLVED (Đã giải quyết 100%)
+
+--------------------------------------------------------------------------------
+
+[MÃ LỖI]: ERR-03-DATA-LEAKAGE
+[HỆ THỐNG]: Tầng Phân tích & Học máy (Machine Learning Pipeline)
+[MÔ TẢ TRIỆU CHỨNG]:
+  Khi chia ngẫu nhiên Train/Test bằng `randomSplit()`, độ chính xác mô hình tăng bất thường
+  nhưng không ổn định khi kiểm thử trên dữ liệu thực tế ngoài tập mẫu.
+[NGUYÊN NHÂN GỐC RỄ]:
+  Nhiều tài khoản Twitter đăng nhiều bài viết liên tục trong cùng một khoảng thời gian ngắn.
+  Việc chia ngẫu nhiên từng dòng đơn lẻ làm tweet của cùng một tác giả xuất hiện ở cả tập Train
+  và tập Test, gây ra hiện tượng rò rỉ thông tin tác giả (Author Leakage). Ngoài ra `randomSplit`
+  trên cụm Spark có thể không đồng nhất nếu phân vùng dữ liệu thay đổi.
+[GIẢI PHÁP KHẮC PHỤC]:
+  - Áp dụng thuật toán băm xác định không phụ thuộc trạng thái cụm:
+    `xxhash64(concat(id, date, user))` kết hợp chia modulo 100.
+  - Phân chia tỷ lệ chuẩn 70% Train (0-69), 15% Validation (70-84), 15% Test (85-99).
+  - Cố định seed = 42 cho toàn bộ các toán tử ngẫu nhiên.
+[KẾT QUẢ KIỂM CHỨNG]:
+  Tập dữ liệu chia hoàn toàn độc lập, kết quả kiểm định nhất quán qua nhiều lần chạy:
+  Accuracy = 74.75%, Macro-F1 = 0.7475.
+[TRẠNG THÁI]: RESOLVED (Đã giải quyết 100%)
+
+--------------------------------------------------------------------------------
+
+[MÃ LỖI]: ERR-04-WINUTILS-NATIVE
+[HỆ THỐNG]: Môi trường chạy Windows / Hadoop Native Binaries
+[MÔ TẢ TRIỆU CHỨNG]:
+  Khi ghi dữ liệu ra tệp Parquet hoặc lưu PipelineModel MLlib trên Windows, Spark báo lỗi:
+  `java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries`.
+[NGUYÊN NHÂN GỐC RỄ]:
+  Apache Spark kế thừa cơ chế truy xuất tệp từ Hadoop. Trên Windows, Hadoop yêu cầu thư viện
+  native `winutils.exe` và `hadoop.dll` để mô phỏng phân quyền tệp POSIX trên nền NTFS.
+[GIẢI PHÁP KHẮC PHỤC]:
+  - Bổ sung thư mục nhị phân `.spark-support/winutils/bin/winutils.exe` và `hadoop.dll`
+    tương thích Hadoop 3.3.6.
+  - Trong script khởi động `setup.ps1` và `twitter_spark/session.py`, tự động thiết lập:
+    os.environ["HADOOP_HOME"] = str(project_root / ".spark-support" / "winutils")
+    os.environ["PATH"] += os.pathsep + str(project_root / ".spark-support" / "winutils" / "bin")
+[KẾT QUẢ KIỂM CHỨNG]:
+  Ghi Parquet Snappy nén 202.4 MB và lưu mô hình MLlib thành công 100% trên Windows và Docker.
+[TRẠNG THÁI]: RESOLVED (Đã giải quyết 100%)
+
+--------------------------------------------------------------------------------
+
+[MÃ LỖI]: ERR-05-HDFS-SAFEMODE
+[HỆ THỐNG]: Cụm Hadoop HDFS trên Docker (HDFS Ingestion)
+[MÔ TẢ TRIỆU CHỨNG]:
+  Lệnh nạp dữ liệu `hdfs dfs -put` thất bại với ngoại lệ:
+  `org.apache.hadoop.hdfs.server.namenode.SafeModeException: NameNode is in safe mode`.
+[NGUYÊN NHÂN GỐC RỄ]:
+  Khi container Hadoop NameNode mới khởi động, hệ thống tự động duy trì trạng thái Safe Mode
+  để chờ DataNode kết nối và gửi Block Report kiểm tra ngưỡng an toàn (99.9% blocks available).
+  Nếu script nạp chạy ngay lập tức, NameNode từ chối quyền ghi (Read-only mode).
+[GIẢI PHÁP KHẮC PHỤC]:
+  - Viết logic kiểm tra sức khỏe và chờ Safe Mode trong `scripts/hdfs_upload.ps1`:
+    $safeMode = docker exec namenode hdfs dfsadmin -safemode get
+    if ($safeMode -match "ON") {
+        docker exec namenode hdfs dfsadmin -safemode leave
+    }
+  - Thiết lập cơ chế retry 3 lần với khoảng cách 5 giây trước khi thực hiện `hdfs dfs -put`.
+[KẾT QUẢ KIỂM CHỨNG]:
+  Tệp dữ liệu 238.8 MB được tải lên HDFS tại `hdfs://localhost:8020/twitter/raw/` đạt tốc độ
+  69.8 MB/s mà không còn gặp bất kỳ lỗi SafeMode nào.
+[TRẠNG THÁI]: RESOLVED (Đã giải quyết 100%)
+
+--------------------------------------------------------------------------------
+
+[MÃ LỖI]: ERR-06-AIRFLOW-PATH
+[HỆ THỐNG]: Điều phối Quy trình Apache Airflow (Workflow Orchestration)
+[MÔ TẢ TRIỆU CHỨNG]:
+  Task `spark_prepare` trong DAG Airflow báo lỗi `FileNotFoundError` khi chạy trên container
+  do không tìm thấy đường dẫn tệp dữ liệu dạng Windows `D:\Subject\...`.
+[NGUYÊN NHÂN GỐC RỄ]:
+  Sự sai lệch giữa định dạng đường dẫn Windows trên máy trạm và đường dẫn Linux trong container
+  Docker Airflow Worker.
+[GIẢI PHÁP KHẮC PHỤC]:
+  - Sử dụng module `pathlib.Path` để định nghĩa đường dẫn tương đối độc lập nền tảng.
+  - Cấu hình volume mount đồng bộ giữa máy trạm và container Airflow trong `docker-compose.yml`.
+  - Thiết lập TaskInstance runner độc lập `scripts/test_airflow_dag.py` kiểm thử toàn bộ 9 task
+    trước khi kích hoạt lịch trình chính thức.
+[KẾT QUẢ KIỂM CHỨNG]:
+  Toàn bộ 9/9 Task trong DAG hoàn thành với trạng thái SUCCESS trong thời gian 2.72 giây.
+[TRẠNG THÁI]: RESOLVED (Đã giải quyết 100%)
+
+--------------------------------------------------------------------------------
+
+[MÃ LỖI]: ERR-07-GUI-THREAD-FREEZE
+[HỆ THỐNG]: Giao diện Desktop Tkinter Dashboard & Live Inference
+[MÔ TẢ TRIỆU CHỨNG]:
+  Khi người dùng nhấn nút "Chạy Spark + HDFS" hoặc nạp dữ liệu lớn, cửa sổ giao diện Tkinter
+  bị đơ (Freeze / Not Responding), con trỏ chuột quay tròn, không cuộn được log.
+[NGUYÊN NHÂN GỐC RỄ]:
+  Lệnh gọi Spark và PowerShell được thực thi trực tiếp trên luồng giao diện chính (Tkinter Main
+  Thread), chiếm đoạt Event Loop và ngăn cản việc render lại các widget.
+[GIẢI PHÁP KHẮC PHỤC]:
+  - Áp dụng mô hình Kiến trúc Bất đồng bộ Đa luồng (Multithreaded Producer-Consumer):
+    + Luồng Worker: `threading.Thread(target=..., daemon=True)` thực thi tiến trình chạy nền.
+    + Hàng đợi An toàn: `queue.Queue` nhận từng dòng output và thông báo trạng thái.
+    + Luồng Giao diện: Sử dụng phương thức `root.after(100, self._poll_events)` định kỳ
+      lấy dữ liệu từ hàng đợi và cập nhật Text Log, Progress Bar và Badge dự đoán.
+[KẾT QUẢ KIỂM CHỨNG]:
+  Giao diện vận hành mượt mà 60 FPS, cập nhật log thời gian thực, người dùng vẫn có thể
+  nhập thử nghiệm dự đoán cảm xúc trực tiếp ngay cả khi Spark đang chạy nền.
+[TRẠNG THÁI]: RESOLVED (Đã giải quyết 100%)
+================================================================================

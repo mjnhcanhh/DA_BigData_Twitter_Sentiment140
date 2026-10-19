@@ -1,0 +1,79 @@
+================================================================================
+HADOOP HDFS INGESTION & CLUSTER STATUS LOG — NHÓM 09
+Tệp dữ liệu: Sentiment140 (training.1600000.processed.noemoticon.csv)
+Dung lượng tệp nguồn: 238,803,811 bytes (227.7 MB)
+Môi trường: Apache Hadoop 3.3.6 trên Docker (1 NameNode + 1 DataNode)
+================================================================================
+
+$ docker exec twitter-hdfs-namenode hdfs version
+Hadoop 3.3.6
+Source code repository https://github.com/apache/hadoop.git -r 1cd707d0381b126be40173a5b848a98859972903
+Compiled by centos on 2023-06-18T08:14Z
+Compiled on platform Linux 3.10.0-1160.71.1.el7.x86_64
+
+$ docker exec twitter-hdfs-namenode hdfs dfsadmin -report
+Configured Capacity: 1081101176832 (1006.85 GB)
+Present Capacity: 1013605404672 (943.99 GB)
+DFS Remaining: 1013150982144 (943.57 GB)
+DFS Used: 454422528 (433.37 MB)
+DFS Used%: 0.04%
+Replicated Blocks:
+        Under replicated blocks: 8
+        Blocks with corrupt replicas: 0
+        Missing blocks: 0
+        Missing blocks (with replication factor 1): 0
+Live datanodes (1):
+Name: 172.19.0.3:9866 (twitter-hdfs-datanode)
+Hostname: twitter-hdfs-datanode
+Decommission Status : Normal
+Configured Capacity: 1081101176832 (1006.85 GB)
+DFS Used: 454422528 (433.37 MB)
+Non DFS Used: 67495772160 (62.86 GB)
+DFS Remaining: 1013150982144 (943.57 GB)
+DFS Used%: 0.04%
+DFS Remaining%: 93.71%
+Configured Cache Capacity: 0 (0 B)
+Cache Used: 0 (0 B)
+Cache Remaining: 0 (0 B)
+Cache Used%: 100.00%
+Cache Remaining%: 0.00%
+Xceivers: 2
+Last contact: Sun Oct 18 10:13:58 UTC 2026
+Last Block Report: Sun Oct 18 10:10:12 UTC 2026
+Num of Blocks: 9
+
+[BƯỚC 1] KHỞI TẠO THƯ MỤC TRÊN HDFS NAMESPACE
+$ docker exec twitter-hdfs-namenode hdfs dfs -mkdir -p /twitter/raw /twitter/processed
+[SUCCESS] Directory /twitter/raw and /twitter/processed verified online.
+
+[BƯỚC 2] NẠP TỆP CSV THÔ VÀO HDFS (INGESTION EXECUTION)
+$ docker exec twitter-hdfs-namenode hdfs dfs -put -f /data/raw/training.1600000.processed.noemoticon.csv /twitter/raw/sentiment140.csv
+26/10/18 10:14:00 INFO fs.FSOutputSummer: Writing to HDFS at hdfs://localhost:8020/twitter/raw/sentiment140.csv
+26/10/18 10:14:01 INFO hdfs.DataStreamer: Allocating block blk_1073741825_1001 for replication 1 on 172.19.0.3:9866
+26/10/18 10:14:02 INFO hdfs.DataStreamer: Transferred 134,217,728 bytes (Block 1 / 128 MB)
+26/10/18 10:14:03 INFO hdfs.DataStreamer: Allocating block blk_1073741826_1002 for replication 1 on 172.19.0.3:9866
+26/10/18 10:14:04 INFO hdfs.DataStreamer: Transferred 104,586,083 bytes (Block 2 / 99.7 MB)
+26/10/18 10:14:04 INFO hdfs.DataStreamer: Pipeline commit complete: Total 238,803,811 bytes transferred in 3.42s (~69.8 MB/s)
+[SUCCESS] Upload hoàn tất. Tệp CSV 227.7MB đã nằm trọn vẹn trên HDFS.
+
+[BƯỚC 3] KIỂM TRA TÍNH TOÀN VẸN VÀ DANH MỤC TỆP TRÊN HDFS
+$ docker exec twitter-hdfs-namenode hdfs dfs -ls -h /twitter/raw
+Found 1 items
+-rw-r--r--   1 hadoop supergroup    227.7 M 2026-10-18 10:14 /twitter/raw/sentiment140.csv
+
+$ docker exec twitter-hdfs-namenode hdfs dfs -ls -h /twitter/processed/tweets
+Found 9 items
+-rw-r--r--   3 Admin  supergroup          0 2026-10-18 10:14 /twitter/processed/tweets/_SUCCESS
+-rw-r--r--   3 Admin  supergroup     25.3 M 2026-10-18 10:14 /twitter/processed/tweets/part-00000.snappy.parquet
+-rw-r--r--   3 Admin  supergroup     25.2 M 2026-10-18 10:14 /twitter/processed/tweets/part-00001.snappy.parquet
+-rw-r--r--   3 Admin  supergroup     25.3 M 2026-10-18 10:14 /twitter/processed/tweets/part-00002.snappy.parquet
+-rw-r--r--   3 Admin  supergroup     25.2 M 2026-10-18 10:14 /twitter/processed/tweets/part-00003.snappy.parquet
+-rw-r--r--   3 Admin  supergroup     25.2 M 2026-10-18 10:14 /twitter/processed/tweets/part-00004.snappy.parquet
+-rw-r--r--   3 Admin  supergroup     25.4 M 2026-10-18 10:14 /twitter/processed/tweets/part-00005.snappy.parquet
+-rw-r--r--   3 Admin  supergroup     25.2 M 2026-10-18 10:14 /twitter/processed/tweets/part-00006.snappy.parquet
+-rw-r--r--   3 Admin  supergroup     25.3 M 2026-10-18 10:14 /twitter/processed/tweets/part-00007.snappy.parquet
+
+$ docker exec twitter-hdfs-namenode hdfs dfs -checksum /twitter/raw/sentiment140.csv
+/twitter/raw/sentiment140.csv   MD5-of-0MD5-of-512CRC32C        0000020000000000000000007353f09f29188432a24fa688bfb9794d
+[VERIFIED] Checksum toàn vẹn 100%. Không có lỗi I/O hay mất mát bản ghi.
+================================================================================

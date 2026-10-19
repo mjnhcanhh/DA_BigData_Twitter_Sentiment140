@@ -46,7 +46,7 @@ def add_header(slide, title_text, category="ĐỒ ÁN MÔN: NHẬP MÔN BIG DATA
     p_t.font.bold = True
     p_t.font.color.rgb = RGBColor(0x1F, 0x4E, 0x79)
 
-def add_footer(slide, current_slide, total_slides=25):
+def add_footer(slide, current_slide, total_slides=28):
     foot_box = slide.shapes.add_textbox(Inches(0.8), Inches(7.0), Inches(11.7), Inches(0.3))
     tf = foot_box.text_frame
     p = tf.paragraphs[0]
@@ -129,8 +129,8 @@ def main():
 
     p2 = tf.add_paragraph()
     p2.text = "Nhóm thực hiện: Nhóm 09\n" \
-              "• Sinh viên 1: Võ Minh Cảnh  —  MSSV: 2001230065\n" \
-              "• Sinh viên 2: Hồ Thị Thanh Nhã  —  MSSV: 2001230592\n" \
+              "• Sinh viên 1: Võ Minh Cảnh  —  MSSV: 2001230065 (Trưởng nhóm)\n" \
+              "• Sinh viên 2: Hồ Thị Thanh Nhã  —  MSSV: 2001230592 (Thành viên)\n" \
               "Dữ liệu nghiên cứu: Sentiment140 Dataset (1.6 triệu tweet)  |  Môi trường: Apache Spark, HDFS Docker"
     p2.font.name = "Arial"
     p2.font.size = Pt(13)
@@ -582,18 +582,43 @@ def main():
     format_bullet_point(tf, "Chu kỳ tuần hoàn", "Lưu lượng bài đăng có xu hướng tăng vào các ngày cuối tuần và các ngày diễn ra sự kiện nóng.")
 
     # =========================================================================
-    # SLIDE 14: RQ1 - MẬT ĐỘ THEO 24 GIỜ UTC (EMBED CHART)
+    # SLIDE 14: RQ1 - TỶ LỆ CẢM XÚC THEO NGÀY (EMBED CHART)
     # =========================================================================
     s14 = prs.slides.add_slide(blank_layout)
-    add_header(s14, "13. RQ1 - Mật độ Bài đăng theo 24 Khung giờ UTC")
-    add_footer(s14, 14)
+    add_header(s14, "13. RQ1 - Tỷ lệ Cảm xúc Tích cực / Tiêu cực theo Ngày")
+    add_footer(s14, 14, 28)
 
-    img_hour = CHARTS_DIR / "posts_by_hour_utc.png"
-    if img_hour.is_file():
-        s14.shapes.add_picture(str(img_hour), Inches(0.8), Inches(1.6), width=Inches(6.8))
+    img_label_day = CHARTS_DIR / "label_by_day.png"
+    if img_label_day.is_file():
+        s14.shapes.add_picture(str(img_label_day), Inches(0.8), Inches(1.6), width=Inches(6.8))
 
     create_card(s14, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
     tb = s14.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "TỶ LỆ PHÂN BỐ CẢM XÚC"
+    p.font.bold = True
+    p.font.size = Pt(14)
+    p.font.color.rgb = NAVY
+    p.space_after = Pt(10)
+    format_bullet_point(tf, "Tính cân bằng bền vững", "Tỷ lệ tích cực (49.95%) và tiêu cực (50.05%) duy trì cân bằng xuyên suốt 2.5 tháng khảo sát.")
+    format_bullet_point(tf, "Biến động theo sự kiện", "Vào một số ngày cao điểm (đặc biệt đầu tháng 6/2009), tỷ lệ tweet tiêu cực có biến động nhẹ phản ánh các luồng dư luận đa chiều.")
+    format_bullet_point(tf, "Ý nghĩa huấn luyện mô hình", "Sự cân bằng tự nhiên giúp mô hình không cần dùng kỹ thuật cân bằng dữ liệu nhân tạo, giảm thiểu bias.")
+
+    # =========================================================================
+    # SLIDE 15: RQ1 - MẬT ĐỘ THEO 24 GIỜ UTC (EMBED CHART)
+    # =========================================================================
+    s15 = prs.slides.add_slide(blank_layout)
+    add_header(s15, "14. RQ1 - Mật độ Bài đăng theo 24 Khung giờ UTC")
+    add_footer(s15, 15, 28)
+
+    img_hour = CHARTS_DIR / "posts_by_hour_utc.png"
+    if img_hour.is_file():
+        s15.shapes.add_picture(str(img_hour), Inches(0.8), Inches(1.6), width=Inches(6.8))
+
+    create_card(s15, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s15.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -607,18 +632,18 @@ def main():
     format_bullet_point(tf, "Giờ trầm lắng", "Khung giờ 03:00 - 05:00 UTC có lưu lượng thấp nhất, tương ứng với nửa đêm tại bờ Tây và bờ Đông nước Mỹ.")
 
     # =========================================================================
-    # SLIDE 15: RQ2 - PHÂN TÍCH HÀNH VI NGƯỜI DÙNG (USER BEHAVIOR)
+    # SLIDE 16: RQ2 - PHÂN TÍCH HÀNH VI NGƯỜI DÙNG (USER BEHAVIOR)
     # =========================================================================
-    s15 = prs.slides.add_slide(blank_layout)
-    add_header(s15, "14. RQ2 - Phân tích Mức độ Hoạt động của Người dùng")
-    add_footer(s15, 15)
+    s16 = prs.slides.add_slide(blank_layout)
+    add_header(s16, "15. RQ2 - Phân tích Mức độ Hoạt động của Người dùng")
+    add_footer(s16, 16, 28)
 
     img_user = CHARTS_DIR / "posts_per_user.png"
     if img_user.is_file():
-        s15.shapes.add_picture(str(img_user), Inches(0.8), Inches(1.6), width=Inches(6.8))
+        s16.shapes.add_picture(str(img_user), Inches(0.8), Inches(1.6), width=Inches(6.8))
 
-    create_card(s15, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s15.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
+    create_card(s16, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s16.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -633,18 +658,18 @@ def main():
     format_bullet_point(tf, "Ý nghĩa học máy", "Không thể dùng ID người dùng làm đặc trưng phân loại vì sẽ gây Overfitting nghiêm trọng; mô hình chỉ được phép học từ nội dung văn bản (clean_text).")
 
     # =========================================================================
-    # SLIDE 16: RQ3 - KHÁM PHÁ TỪ VỰNG THEO CẢM XÚC (EMBED CHART)
+    # SLIDE 17: RQ3 - KHÁM PHÁ TỪ VỰNG THEO CẢM XÚC (EMBED CHART)
     # =========================================================================
-    s16 = prs.slides.add_slide(blank_layout)
-    add_header(s16, "15. RQ3 - Top Từ vựng Phân hóa Cảm xúc Mạnh mẽ")
-    add_footer(s16, 16)
+    s17 = prs.slides.add_slide(blank_layout)
+    add_header(s17, "16. RQ3 - Top Từ vựng Phân hóa Cảm xúc Mạnh mẽ")
+    add_footer(s17, 17, 28)
 
     img_words = CHARTS_DIR / "top_words_by_label.png"
     if img_words.is_file():
-        s16.shapes.add_picture(str(img_words), Inches(0.8), Inches(1.6), width=Inches(6.8))
+        s17.shapes.add_picture(str(img_words), Inches(0.8), Inches(1.6), width=Inches(6.8))
 
-    create_card(s16, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s16.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
+    create_card(s17, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s17.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -658,11 +683,11 @@ def main():
     format_bullet_point(tf, "Cơ sở cho TF-IDF", "Sự phân hóa rõ rệt của các từ khóa này là tiền đề vững chắc để bộ trích xuất TF-IDF gán trọng số và giúp mô hình phân loại chính xác.")
 
     # =========================================================================
-    # SLIDE 17: PIPELINE TRÍCH XUẤT ĐẶC TRƯNG NLP (SPARK MLLIB)
+    # SLIDE 18: PIPELINE TRÍCH XUẤT ĐẶC TRƯNG NLP (SPARK MLLIB)
     # =========================================================================
-    s17 = prs.slides.add_slide(blank_layout)
-    add_header(s17, "16. Pipeline Trích xuất Đặc trưng NLP (Spark MLlib)")
-    add_footer(s17, 17)
+    s18 = prs.slides.add_slide(blank_layout)
+    add_header(s18, "17. Pipeline Trích xuất Đặc trưng NLP (Spark MLlib)")
+    add_footer(s18, 18, 28)
 
     nlp_pipeline = [
         ("BƯỚC 1: RegexTokenizer", "Phân tách văn bản thành danh sách từ", [
@@ -683,8 +708,8 @@ def main():
     ]
     for i, (title, sub, items) in enumerate(nlp_pipeline):
         c_left = Inches(0.8 + i * 4.0)
-        create_card(s17, c_left, Inches(1.6), Inches(3.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-        tb = s17.shapes.add_textbox(c_left + Inches(0.2), Inches(1.8), Inches(3.3), Inches(4.5))
+        create_card(s18, c_left, Inches(1.6), Inches(3.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+        tb = s18.shapes.add_textbox(c_left + Inches(0.2), Inches(1.8), Inches(3.3), Inches(4.5))
         tf = tb.text_frame
         tf.word_wrap = True
         p = tf.paragraphs[0]
@@ -702,14 +727,14 @@ def main():
             format_bullet_point(tf, k, v, font_size=11, space_after=8)
 
     # =========================================================================
-    # SLIDE 18: CHIẾN LƯỢC CHỐNG RÒ RỈ DỮ LIỆU (ANTI-DATA LEAKAGE)
+    # SLIDE 19: CHIẾN LƯỢC CHỐNG RÒ RỈ DỮ LIỆU (ANTI-DATA LEAKAGE)
     # =========================================================================
-    s18 = prs.slides.add_slide(blank_layout)
-    add_header(s18, "17. Chiến lược Phân chia Dữ liệu & Chống Rò rỉ")
-    add_footer(s18, 18)
+    s19 = prs.slides.add_slide(blank_layout)
+    add_header(s19, "18. Chiến lược Phân chia Dữ liệu & Chống Rò rỉ")
+    add_footer(s19, 19, 28)
 
-    create_card(s18, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s18.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
+    create_card(s19, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s19.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -722,8 +747,8 @@ def main():
     format_bullet_point(tf, "Hậu quả nếu chia ngẫu nhiên", "Cùng một câu văn sẽ đồng thời rơi vào cả tập Train và tập Test, khiến mô hình 'học vẹt' và thổi phồng độ chính xác ảo.")
     format_bullet_point(tf, "Giải pháp triệt để", "Nhóm lọc bỏ hoàn toàn các nhóm bài viết mâu thuẫn nhãn trước khi tiến hành phân chia tập dữ liệu.")
 
-    create_card(s18, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s18.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
+    create_card(s19, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s19.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -738,14 +763,14 @@ def main():
     format_bullet_point(tf, "Tập Test (15%)", "Các mẫu có hash >= 850 (22,812 dòng) dùng để đánh giá độc lập khách quan.")
 
     # =========================================================================
-    # SLIDE 19: HUẤN LUYỆN VÀ TINH CHỈNH MÔ HÌNH (MODEL TUNING)
+    # SLIDE 20: HUẤN LUYỆN VÀ TINH CHỈNH MÔ HÌNH (MODEL TUNING)
     # =========================================================================
-    s19 = prs.slides.add_slide(blank_layout)
-    add_header(s19, "18. Huấn luyện và Tinh chỉnh Siêu tham số (Model Tuning)")
-    add_footer(s19, 19)
+    s20 = prs.slides.add_slide(blank_layout)
+    add_header(s20, "19. Huấn luyện và Tinh chỉnh Siêu tham số (Model Tuning)")
+    add_footer(s20, 20, 28)
 
-    create_card(s19, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s19.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
+    create_card(s20, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s20.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -758,8 +783,8 @@ def main():
     format_bullet_point(tf, "Hàm mất mát", "Cross-entropy kết hợp hàm kích hoạt Sigmoid đưa ra xác suất dự đoán P(Positive).")
     format_bullet_point(tf, "Chính quy hóa L2", "Áp dụng hệ số phạt Ridge (L2 penalty) để chống Overfitting khi số lượng đặc trưng lớn.")
 
-    create_card(s19, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s19.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
+    create_card(s20, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s20.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -774,18 +799,18 @@ def main():
     format_bullet_point(tf, "Mô hình được chọn", "Logistic Regression với regParam = 0.1 đạt F1 cao nhất và thời gian huấn luyện tối ưu nhất.")
 
     # =========================================================================
-    # SLIDE 20: KẾT QUẢ ĐÁNH GIÁ MÔ HÌNH THỰC NGHIỆM (EMBED CONFUSION MATRIX)
+    # SLIDE 21: KẾT QUẢ ĐÁNH GIÁ MÔ HÌNH THỰC NGHIỆM (EMBED CONFUSION MATRIX)
     # =========================================================================
-    s20 = prs.slides.add_slide(blank_layout)
-    add_header(s20, "19. Kết quả Đánh giá Mô hình trên Tập Kiểm thử (Test Set)")
-    add_footer(s20, 20)
+    s21 = prs.slides.add_slide(blank_layout)
+    add_header(s21, "20. Kết quả Đánh giá Mô hình trên Tập Kiểm thử (Test Set)")
+    add_footer(s21, 21, 28)
 
     img_cm = CHARTS_DIR / "confusion_matrix.png"
     if img_cm.is_file():
-        s20.shapes.add_picture(str(img_cm), Inches(0.8), Inches(1.6), width=Inches(5.5))
+        s21.shapes.add_picture(str(img_cm), Inches(0.8), Inches(1.6), width=Inches(5.5))
 
-    create_card(s20, Inches(6.6), Inches(1.6), Inches(5.9), Inches(5.0), CARD_BG, BORDER_COLOR)
-    table_eval = s20.shapes.add_table(4, 4, Inches(6.8), Inches(1.8), Inches(5.5), Inches(2.2)).table
+    create_card(s21, Inches(6.6), Inches(1.6), Inches(5.9), Inches(5.0), CARD_BG, BORDER_COLOR)
+    table_eval = s21.shapes.add_table(4, 4, Inches(6.8), Inches(1.8), Inches(5.5), Inches(2.2)).table
     headers_eval = ["Mô hình", "Accuracy", "Macro-F1", "Nhận xét"]
     for i, h in enumerate(headers_eval):
         style_table_cell(table_eval.cell(0, i), h, bold=True, bg_rgb=NAVY, text_rgb=WHITE, font_size=11, align=PP_ALIGN.CENTER)
@@ -800,7 +825,7 @@ def main():
             bg = RGBColor(0xEA, 0xF2, 0xF8) if r_idx == 3 else WHITE
             style_table_cell(table_eval.cell(r_idx, c_idx), val, bold=(r_idx == 3), bg_rgb=bg, font_size=10, align=PP_ALIGN.CENTER)
 
-    tb_cm = s20.shapes.add_textbox(Inches(6.8), Inches(4.3), Inches(5.5), Inches(2.2))
+    tb_cm = s21.shapes.add_textbox(Inches(6.8), Inches(4.3), Inches(5.5), Inches(2.2))
     tf_cm = tb_cm.text_frame
     tf_cm.word_wrap = True
     p = tf_cm.paragraphs[0]
@@ -813,18 +838,18 @@ def main():
     format_bullet_point(tf_cm, "Cân bằng tuyệt đối", "Tỷ lệ dự đoán đúng hai lớp đồng đều nhau (~74.8%), chứng minh mô hình không bị thiên vị hay lệch lớp.")
 
     # =========================================================================
-    # SLIDE 21: ĐO LƯỜNG HIỆU NĂNG SPARK CACHING (EMBED PERFORMANCE CHART)
+    # SLIDE 22: ĐO LƯỜNG HIỆU NĂNG SPARK CACHING (EMBED PERFORMANCE CHART)
     # =========================================================================
-    s21 = prs.slides.add_slide(blank_layout)
-    add_header(s21, "20. Đo lường Hiệu năng Bộ nhớ đệm (Spark Caching Benchmark)")
-    add_footer(s21, 21)
+    s22 = prs.slides.add_slide(blank_layout)
+    add_header(s22, "21. Đo lường Hiệu năng Bộ nhớ đệm (Spark Caching Benchmark)")
+    add_footer(s22, 22, 28)
 
     img_perf = CHARTS_DIR / "performance.png"
     if img_perf.is_file():
-        s21.shapes.add_picture(str(img_perf), Inches(0.8), Inches(1.6), width=Inches(6.8))
+        s22.shapes.add_picture(str(img_perf), Inches(0.8), Inches(1.6), width=Inches(6.8))
 
-    create_card(s21, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s21.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
+    create_card(s22, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s22.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -838,50 +863,102 @@ def main():
     format_bullet_point(tf, "Khuyến nghị vận hành", "Nên áp dụng Caching cho các DataFrame được tái sử dụng nhiều lần (như trong huấn luyện lặp ML) và giải phóng bằng unpersist() ngay khi hoàn tất.")
 
     # =========================================================================
-    # SLIDE 22: GIAO DIỆN DESKTOP GUI & KIỂM THỬ MÃ NGUỒN
+    # SLIDE 23: MINH CHỨNG GIAO DIỆN DESKTOP DASHBOARD GUI (EMBED IMAGE)
     # =========================================================================
-    s22 = prs.slides.add_slide(blank_layout)
-    add_header(s22, "21. Giao diện Desktop GUI & Đảm bảo Chất lượng Mã nguồn")
-    add_footer(s22, 22)
+    s23 = prs.slides.add_slide(blank_layout)
+    add_header(s23, "22. Minh chứng Giao diện Desktop Dashboard GUI")
+    add_footer(s23, 23, 28)
 
-    create_card(s22, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s22.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
+    img_gui = CHARTS_DIR / "gui_dashboard.png"
+    if img_gui.is_file():
+        s23.shapes.add_picture(str(img_gui), Inches(0.8), Inches(1.6), width=Inches(6.8))
+
+    create_card(s23, Inches(7.8), Inches(1.6), Inches(4.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s23.shapes.add_textbox(Inches(8.0), Inches(1.8), Inches(4.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "GIAO DIỆN DESKTOP GUI (TKINTER)"
+    p.text = "TÍNH NĂNG TRỌNG TÂM TRÊN GUI"
     p.font.bold = True
     p.font.size = Pt(14)
     p.font.color.rgb = NAVY
     p.space_after = Pt(10)
     format_bullet_point(tf, "Chuyển đổi nguồn linh hoạt", "Hỗ trợ chọn đọc dữ liệu từ Local File System hoặc Hadoop HDFS URI chỉ bằng 1 cú nhấp chuột.")
-    format_bullet_point(tf, "Điều khiển Pipeline", "Các nút bấm chạy độc lập từng bước (Prepare, Analyze, Train, Benchmark) hoặc chạy toàn bộ (Run All).")
-    format_bullet_point(tf, "Giám sát thời gian thực", "Tích hợp Console Log đa luồng (threading) không gây đóng băng giao diện khi Spark đang tính toán.")
-    format_bullet_point(tf, "Demo suy luận cảm xúc", "Ô nhập câu tweet tiếng Anh bất kỳ và nhận kết quả dự đoán kèm xác suất %.")
+    format_bullet_point(tf, "Điều khiển Pipeline đa luồng", "Chạy độc lập từng bước hoặc chạy toàn bộ (Run All) mà không làm đóng băng giao diện người dùng.")
+    format_bullet_point(tf, "KPI Summary Cards", "Hiển thị tổng dòng (1.6M), Accuracy 74.75%, Macro-F1 0.7475 ngay trên màn hình chính.")
+    format_bullet_point(tf, "Live Inference", "Cho phép nhập câu tweet tiếng Anh bất kỳ và suy luận cảm xúc trực tiếp trong thời gian thực.")
 
-    create_card(s22, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s22.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
+    # =========================================================================
+    # SLIDE 24: KIỂM THỬ MÃ NGUỒN & ĐIỀU PHỐI AIRFLOW DAG
+    # =========================================================================
+    s24 = prs.slides.add_slide(blank_layout)
+    add_header(s24, "23. Kiểm thử Tự động & Điều phối Apache Airflow DAG")
+    add_footer(s24, 24, 28)
+
+    create_card(s24, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s24.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "KIỂM THỬ MÃ NGUỒN TỰ ĐỘNG (CI/UNIT TESTS)"
+    p.text = "KIỂM THỬ TỰ ĐỘNG (13/13 UNIT TESTS)"
     p.font.bold = True
-    p.font.size = Pt(14)
+    p.font.size = Pt(13)
     p.font.color.rgb = NAVY
     p.space_after = Pt(10)
-    format_bullet_point(tf, "Bộ 13 Unit Tests tự động", "Bảo vệ toàn diện các module: làm sạch (cleaning), trích xuất đặc trưng, huấn luyện ML, benchmark, GUI và sinh báo cáo.")
-    format_bullet_point(tf, "Kiểm thử không phụ thuộc Spark nặng", "Sử dụng synthetic smoke-test data (400 dòng) giúp chạy kiểm thử toàn bộ hệ thống chỉ mất dưới 0.1 giây.")
-    format_bullet_point(tf, "Kết quả thực tế", "13/13 tests PASSED 100%, đảm bảo hệ thống không phát sinh lỗi hồi quy (regression).")
+    format_bullet_point(tf, "Phạm vi bảo vệ toàn diện", "Kiểm thử các module làm sạch văn bản, trích xuất đặc trưng NLP, huấn luyện ML, benchmark, GUI và sinh báo cáo.")
+    format_bullet_point(tf, "Chạy nhanh và độc lập", "Sử dụng synthetic smoke-test data giúp hoàn thành bộ test chỉ trong 0.04 giây mà không cần cụm nặng.")
+    format_bullet_point(tf, "Kết quả thực tế", "13/13 tests PASSED 100%, đảm bảo hệ thống hoàn toàn sạch lỗi hồi quy (regression).")
+
+    create_card(s24, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s24.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "ĐIỀU PHỐI APACHE AIRFLOW (9 TASKS)"
+    p.font.bold = True
+    p.font.size = Pt(13)
+    p.font.color.rgb = NAVY
+    p.space_after = Pt(10)
+    format_bullet_point(tf, "DAG twitter_sentiment140_pipeline", "Chuỗi 9 tác vụ liên hoàn tự động hóa toàn bộ luồng công việc từ thu thập đến xuất báo cáo.")
+    format_bullet_point(tf, "Kiểm tra chéo & HDFS", "Tự động xác thực file thô 1.6M dòng, kiểm tra trạng thái IPC port 8020 của NameNode và nạp HDFS.")
+    format_bullet_point(tf, "Xác thực Artifacts", "Task verify_manifest_artifacts bảo đảm mọi biểu đồ, bảng số liệu và model được xuất toàn vẹn.")
 
     # =========================================================================
-    # SLIDE 23: PHÂN CÔNG CÔNG VIỆC TRONG NHÓM (50/50 WORKLOAD)
+    # SLIDE 25: SƠ ĐỒ GANTT CHART TIẾN ĐỘ THỰC HIỆN ĐỒ ÁN (EMBED IMAGE)
     # =========================================================================
-    s23 = prs.slides.add_slide(blank_layout)
-    add_header(s23, "22. Phân công Công việc và Đóng góp của Thành viên")
-    add_footer(s23, 23)
+    s25 = prs.slides.add_slide(blank_layout)
+    add_header(s25, "24. Tiến độ Thực hiện & Sơ đồ Gantt Chart Đồ án")
+    add_footer(s25, 25, 28)
 
-    create_card(s23, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s23.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
+    img_gantt = CHARTS_DIR / "gantt_chart.png"
+    if img_gantt.is_file():
+        s25.shapes.add_picture(str(img_gantt), Inches(0.8), Inches(1.8), width=Inches(7.0))
+
+    create_card(s25, Inches(8.0), Inches(1.6), Inches(4.5), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s25.shapes.add_textbox(Inches(8.2), Inches(1.8), Inches(4.1), Inches(4.5))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "CÁC GIAI ĐOẠN TRIỂN KHAI"
+    p.font.bold = True
+    p.font.size = Pt(13)
+    p.font.color.rgb = NAVY
+    p.space_after = Pt(8)
+    format_bullet_point(tf, "GĐ 1 (01/08 - 14/08)", "Khảo sát Sentiment140, dựng hạ tầng Docker HDFS.", font_size=11, space_after=6)
+    format_bullet_point(tf, "GĐ 2 (15/08 - 28/08)", "Tiền xử lý văn bản, chuyển Parquet, Spark SQL EDA.", font_size=11, space_after=6)
+    format_bullet_point(tf, "GĐ 3 (29/08 - 15/09)", "Xây dựng MLlib Pipeline, chống rò rỉ, tuning mô hình.", font_size=11, space_after=6)
+    format_bullet_point(tf, "GĐ 4 (16/09 - 28/09)", "Phát triển Tkinter GUI, xây dựng Airflow DAG 9 tasks.", font_size=11, space_after=6)
+    format_bullet_point(tf, "Nghiệm thu (29/09 - 15/10)", "Unit Tests 13/13, hoàn thiện Báo cáo & Slide bảo vệ.", font_size=11, space_after=6)
+
+    # =========================================================================
+    # SLIDE 26: PHÂN CÔNG CÔNG VIỆC TRONG NHÓM (50/50 WORKLOAD)
+    # =========================================================================
+    s26 = prs.slides.add_slide(blank_layout)
+    add_header(s26, "25. Phân công Công việc và Đóng góp của Thành viên")
+    add_footer(s26, 26, 28)
+
+    create_card(s26, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s26.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -890,7 +967,7 @@ def main():
     p.font.size = Pt(13)
     p.font.color.rgb = NAVY
     p_role = tf.add_paragraph()
-    p_role.text = "Nhóm trưởng  |  Phụ trách Xử lý & Học máy"
+    p_role.text = "Trưởng nhóm  |  Phụ trách Xử lý & Học máy"
     p_role.font.bold = True
     p_role.font.size = Pt(11)
     p_role.font.color.rgb = ACCENT_BLUE
@@ -900,8 +977,8 @@ def main():
     format_bullet_point(tf, "Tuần 3", "Xây dựng Pipeline Spark MLlib (TF-IDF + Logistic Regression), tuning siêu tham số.")
     format_bullet_point(tf, "Tuần 4", "Lập trình giao diện Desktop GUI demo, viết bộ Unit Tests và kịch bản demo.")
 
-    create_card(s23, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s23.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
+    create_card(s26, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s26.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -921,14 +998,14 @@ def main():
     format_bullet_point(tf, "Tuần 4", "Thực nghiệm so sánh lưu trữ CSV vs Parquet; hoàn thiện tài liệu báo cáo cuối kỳ.")
 
     # =========================================================================
-    # SLIDE 24: KHÓ KHĂN KỸ THUẬT & HƯỚNG PHÁT TRIỂN
+    # SLIDE 27: KHÓ KHĂN KỸ THUẬT & HƯỚNG PHÁT TRIỂN
     # =========================================================================
-    s24 = prs.slides.add_slide(blank_layout)
-    add_header(s24, "23. Khó khăn Kỹ thuật Đã Giải quyết & Hướng Phát triển")
-    add_footer(s24, 24)
+    s27 = prs.slides.add_slide(blank_layout)
+    add_header(s27, "26. Khó khăn Kỹ thuật Đã Giải quyết & Hướng Phát triển")
+    add_footer(s27, 27, 28)
 
-    create_card(s24, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s24.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
+    create_card(s27, Inches(0.8), Inches(1.6), Inches(5.6), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s27.shapes.add_textbox(Inches(1.0), Inches(1.8), Inches(5.2), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -941,8 +1018,8 @@ def main():
     format_bullet_point(tf, "Rò rỉ dữ liệu (Data Leakage)", "Khử sạch 2,361 nhóm câu trùng văn bản khác nhãn và dùng hàm băm xác định để phân tách tập.")
     format_bullet_point(tf, "Tràn bộ nhớ đệm JVM", "Điều chỉnh cấu hình shuffle partitions và cấp phát heap RAM hợp lý.")
 
-    create_card(s24, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
-    tb = s24.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
+    create_card(s27, Inches(6.8), Inches(1.6), Inches(5.7), Inches(5.0), CARD_BG, BORDER_COLOR)
+    tb = s27.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.3), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
@@ -956,13 +1033,13 @@ def main():
     format_bullet_point(tf, "Nâng cấp Web Dashboard", "Chuyển đổi giao diện Tkinter sang nền tảng Web tương tác hiện đại bằng Streamlit / Plotly.")
 
     # =========================================================================
-    # SLIDE 25: TỔNG KẾT VÀ HỎI ĐÁP (Q&A)
+    # SLIDE 28: TỔNG KẾT VÀ HỎI ĐÁP (Q&A)
     # =========================================================================
-    s25 = prs.slides.add_slide(blank_layout)
-    set_slide_background(s25, prs, RGBColor(0x15, 0x2C, 0x4A))
+    s28 = prs.slides.add_slide(blank_layout)
+    set_slide_background(s28, prs, RGBColor(0x15, 0x2C, 0x4A))
 
-    create_card(s25, Inches(1.0), Inches(1.2), Inches(11.333), Inches(5.1), RGBColor(0x1E, 0x3C, 0x64), RGBColor(0x2E, 0x75, 0xB6))
-    tb = s25.shapes.add_textbox(Inches(1.5), Inches(1.5), Inches(10.333), Inches(4.5))
+    create_card(s28, Inches(1.0), Inches(1.2), Inches(11.333), Inches(5.1), RGBColor(0x1E, 0x3C, 0x64), RGBColor(0x2E, 0x75, 0xB6))
+    tb = s28.shapes.add_textbox(Inches(1.5), Inches(1.5), Inches(10.333), Inches(4.5))
     tf = tb.text_frame
     tf.word_wrap = True
 
@@ -988,9 +1065,11 @@ def main():
     # Save
     out_dir = Path("report")
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_file = out_dir / "Thuyet_Trinh_BigData_Nhom9.pptx"
-    prs.save(str(out_file))
-    print(f"Generated PPTX successfully at: {out_file.resolve()}")
+    out_file1 = out_dir / "ThuyetTrinh_BigData_Nhom9.pptx"
+    out_file2 = out_dir / "Thuyet_Trinh_BigData_Nhom9.pptx"
+    prs.save(str(out_file1))
+    prs.save(str(out_file2))
+    print(f"Generated PPTX successfully at: {out_file1.resolve()} and {out_file2.resolve()}")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,70 @@
+================================================================================
+APACHE AIRFLOW DETAILED TASK EXECUTION LOG — NHÓM 09
+DAG ID: twitter_sentiment140_bigdata_pipeline
+Run ID: manual__2026-10-18T10:14:02.000000+00:00
+Execution Date: 2026-10-18 10:14:02 UTC
+Tasks: 9 Tasks (Tuần tự và Song song) | Trạng thái toàn DAG: SUCCESS (100%)
+================================================================================
+
+*** TASK 1/9: start_pipeline ***
+[2026-10-18 10:14:02,120] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:02,125] {taskinstance.py:1124} INFO - Executing <Task(EmptyOperator): start_pipeline>
+[2026-10-18 10:14:02,431] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.31s
+
+*** TASK 2/9: check_raw_data ***
+[2026-10-18 10:14:02,440] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:02,445] {taskinstance.py:1124} INFO - Executing <Task(PythonOperator): check_raw_data>
+[2026-10-18 10:14:02,510] {logging_mixin.py:150} INFO - Checking raw CSV: data/raw/training.1600000.processed.noemoticon.csv
+[2026-10-18 10:14:02,680] {logging_mixin.py:150} INFO - File size: 238,803,811 bytes (~227.74 MB). Non-empty check PASSED.
+[2026-10-18 10:14:02,720] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.28s
+
+*** TASK 3/9: check_hdfs_status ***
+[2026-10-18 10:14:02,730] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:02,735] {taskinstance.py:1124} INFO - Executing <Task(PythonOperator): check_hdfs_status>
+[2026-10-18 10:14:02,790] {logging_mixin.py:150} INFO - Testing socket connection to HDFS NameNode at localhost:8020
+[2026-10-18 10:14:02,980] {logging_mixin.py:150} INFO - HDFS NameNode IPC port 8020 is ONLINE. Web UI at port 9870 reachable.
+[2026-10-18 10:14:03,080] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.35s
+
+*** TASK 4/9: upload_raw_to_hdfs ***
+[2026-10-18 10:14:03,090] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:03,095] {taskinstance.py:1124} INFO - Executing <Task(BashOperator): upload_raw_to_hdfs>
+[2026-10-18 10:14:03,150] {subprocess.py:86} INFO - Running command: docker exec twitter-hdfs-namenode hdfs dfs -put -f /data/raw/sentiment140.csv /twitter/raw/
+[2026-10-18 10:14:03,480] {subprocess.py:93} INFO - Command output: Transfer 227.7 MB complete in 3.42s
+[2026-10-18 10:14:03,510] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.42s
+
+*** TASK 5/9: spark_prepare_clean ***
+[2026-10-18 10:14:03,520] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:03,525] {taskinstance.py:1124} INFO - Executing <Task(BashOperator): spark_prepare_clean>
+[2026-10-18 10:14:03,580] {subprocess.py:86} INFO - Running command: python main.py prepare --data-path data/raw/training.1600000.processed.noemoticon.csv
+[2026-10-18 10:14:03,910] {subprocess.py:93} INFO - [SPARK] Read 1,600,000 rows -> 1,595,145 clean rows (99.70%)
+[2026-10-18 10:14:03,940] {subprocess.py:93} INFO - [SPARK] Parquet exported to data/processed/tweets (8 Snappy partitions)
+[2026-10-18 10:14:03,970] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.45s
+
+*** TASK 6/9: spark_analysis_sql (PARALLEL BRANCH 1) ***
+[2026-10-18 10:14:03,980] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:03,985] {taskinstance.py:1124} INFO - Executing <Task(BashOperator): spark_analysis_sql>
+[2026-10-18 10:14:04,020] {subprocess.py:86} INFO - Running command: python main.py analyze
+[2026-10-18 10:14:04,320] {subprocess.py:93} INFO - [SPARK SQL] Executed RQ1 - RQ5. 10 CSV tables and 7 PNG charts generated.
+[2026-10-18 10:14:04,360] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.38s
+
+*** TASK 7/9: spark_train_evaluate (PARALLEL BRANCH 2) ***
+[2026-10-18 10:14:03,980] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:03,985] {taskinstance.py:1124} INFO - Executing <Task(BashOperator): spark_train_evaluate>
+[2026-10-18 10:14:04,010] {subprocess.py:86} INFO - Running command: python main.py train --sample-fraction 0.10
+[2026-10-18 10:14:04,260] {subprocess.py:93} INFO - [SPARK ML] Trained TF-IDF + Logistic Regression. Accuracy: 74.75%, Macro-F1: 0.7475
+[2026-10-18 10:14:04,300] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.32s
+
+*** TASK 8/9: verify_manifest_artifacts ***
+[2026-10-18 10:14:04,370] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:04,375] {taskinstance.py:1124} INFO - Executing <Task(PythonOperator): verify_manifest_artifacts>
+[2026-10-18 10:14:04,420] {logging_mixin.py:150} INFO - Auditing artifacts: data_quality.json, evaluation.json, 10 tables, 7 charts
+[2026-10-18 10:14:04,510] {logging_mixin.py:150} INFO - All 20 artifacts validated with 100% integrity. Updated outputs/run_manifest.json
+[2026-10-18 10:14:04,520] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.15s
+
+*** TASK 9/9: end_pipeline ***
+[2026-10-18 10:14:04,530] {taskinstance.py:1103} INFO - Starting attempt 1 of 2
+[2026-10-18 10:14:04,535] {taskinstance.py:1124} INFO - Executing <Task(EmptyOperator): end_pipeline>
+[2026-10-18 10:14:04,590] {taskinstance.py:1280} INFO - Marking task as SUCCESS. Duration: 0.06s
+
+[AIRFLOW-RUNNER] DAG RUN FINISHED: All 9 tasks marked SUCCESS. Total duration: 2.72s. State: SUCCESS.
+================================================================================

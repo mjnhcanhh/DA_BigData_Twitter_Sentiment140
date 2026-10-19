@@ -22,3 +22,7 @@ tmp/
 !outputs/
 !outputs/**
 
+# Submission package duplicates
+submission_package/
+/Nhom09_BaoCaoCuoiKy_BigData_HoSoNghiemThu.zip
+

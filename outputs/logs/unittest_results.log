@@ -1,0 +1,20 @@
+
+test_demo_csv_has_six_columns_and_both_labels (test_demo_data.DemoDataTests) ... ok
+test_rejects_too_few_rows (test_demo_data.DemoDataTests) ... ok
+test_binary_metrics_and_confusion_orientation (test_evaluation.MetricsTests) ... ok
+test_empty_predictions_are_safe (test_evaluation.MetricsTests) ... ok
+test_builds_safe_powershell_argument_list (test_gui.GuiHelperTests) ... ok
+test_loads_result_cards (test_gui.GuiHelperTests) ... ok
+test_predict_interactive_sentiment (test_gui.GuiHelperTests) ... ok
+test_validates_sample_fraction (test_gui.GuiHelperTests) ... ok
+test_build_replacement_dict (test_report_filler.ReportFillerTests) ... ok
+test_populate_report_no_missing_keys (test_report_filler.ReportFillerTests) ... ok
+test_cleaning_removes_url_and_mention_but_keeps_negation (test_spark_cleaning.SparkCleaningTests) ... skipped 'Set RUN_SPARK_TESTS=1 to run Spark integration tests'
+test_creates_parent_only_for_local_path (test_storage.StoragePathTests) ... ok
+test_detects_hdfs_uri (test_storage.StoragePathTests) ... ok
+test_local_windows_path_is_not_remote_uri (test_storage.StoragePathTests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.025s
+
+OK (skipped=1)

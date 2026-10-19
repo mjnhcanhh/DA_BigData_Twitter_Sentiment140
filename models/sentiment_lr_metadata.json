@@ -1,7 +1,7 @@
 {
   "model_path": "models\\sentiment_lr",
-  "selected_reg_param": 0.1,
-  "validation_macro_f1": 0.7522030677395772,
+  "selected_reg_param": 0.01,
+  "validation_macro_f1": 1.0,
   "label_mapping": {
     "0": "negative",
     "1": "positive"

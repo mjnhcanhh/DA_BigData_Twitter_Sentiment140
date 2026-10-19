@@ -195,6 +195,9 @@ def build_parser() -> argparse.ArgumentParser:
     _add_common(storage_cmp)
     storage_cmp.add_argument("--data", default="data/raw/training.1600000.processed.noemoticon.csv")
 
+    gui_parser = sub.add_parser("gui", help="launch desktop Tkinter dashboard interface")
+    gui_parser.add_argument("--check", action="store_true", help="check dependencies without opening a window")
+
     return parser
 
 
@@ -212,11 +215,15 @@ def main(argv: list[str] | None = None) -> int:
         print("  3. So sanh dung luong CSV vs Parquet:")
         print("     python main.py storage-compare")
         print("  4. Khoi chay giao dien GUI:")
-        print("     python -m twitter_spark.gui")
+        print("     python main.py gui")
         print("=" * 60)
         return 0
 
     args = parser.parse_args(effective_args)
+    if args.command == "gui":
+        from .gui import main as gui_main
+        return gui_main(["--check"] if getattr(args, "check", False) else [])
+
     if args.command == "make-demo-data":
         count = generate_demo_csv(args.output, args.rows, args.seed)
         print(f"Created {count} synthetic rows at {args.output}")

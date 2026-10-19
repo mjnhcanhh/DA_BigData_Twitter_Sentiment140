@@ -3,10 +3,21 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from twitter_spark.gui import load_result_summary, powershell_command, validate_sample_fraction
+from twitter_spark.gui import load_result_summary, powershell_command, predict_interactive, validate_sample_fraction
 
 
 class GuiHelperTests(unittest.TestCase):
+    def test_predict_interactive_sentiment(self):
+        res_pos = predict_interactive(input_str="I love this amazing spark pipeline!")
+        self.assertEqual(res_pos["prediction"], 1)
+        self.assertIn("Tích cực", res_pos["label"])
+        self.assertGreater(res_pos["confidence"], 0.7)
+
+        res_neg = predict_interactive(input_str="I hate waiting in traffic so much, worst day ever.")
+        self.assertEqual(res_neg["prediction"], 0)
+        self.assertIn("Tiêu cực", res_neg["label"])
+        self.assertGreater(res_neg["confidence"], 0.7)
+
     def test_validates_sample_fraction(self):
         self.assertEqual(validate_sample_fraction("0.10"), 0.10)
         self.assertEqual(validate_sample_fraction("1"), 1.0)
