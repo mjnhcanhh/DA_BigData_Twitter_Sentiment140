@@ -43,9 +43,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo.ps1
 
 Nếu lệnh `python` không trỏ tới Python 3.11, truyền đường dẫn cụ thể:
 
-```powershell
-.\scripts\setup.ps1 -PythonCommand "C:\duong-dan\python.exe"
-```
+### Ghi chú riêng cho Windows (Winutils & Hadoop)
+Nếu không có `HADOOP_HOME/winutils.exe`, project đã tích hợp sẵn nhị phân Hadoop 3.3.6 tại `.spark-support/winutils/` và adapter local-filesystem từ `java/twitter_spark/NoPermissionLocalFileSystem.java`. Script `.\scripts\setup.ps1` sẽ tự động cấu hình đường dẫn và biến môi trường.
 
 ## 2. Chạy bằng giao diện
 
@@ -231,58 +230,11 @@ bộ nhớ đệm của Docker.
 # (Hoặc chạy nhanh bằng: .\scripts\populate_report.ps1)
 ```
 
-## 8. Gợi ý kịch bản 8-10 phút
-
-1. Mở `data_quality.json`: schema, số dòng, nhãn, ID trùng, lỗi ngày.
-2. Giải thích CSV gốc -> làm sạch -> Parquet -> temporary view `tweets`.
-3. Mở 2-3 hình trong `outputs/charts/`, nhấn mạnh giờ UTC và phạm vi "trong mẫu".
-4. Mở `evaluation.json`: cách chia 70/15/15, validation chọn `regParam`, test chỉ chạy sau đó.
-5. Mở ma trận nhầm lẫn và `misclassified_examples.csv` để nói về phủ định/nhãn nhiễu.
-6. Chạy lệnh `predict` với ba câu trong tài liệu.
-7. Mở `performance.csv`: ba lần đo, trung vị, cached/uncached và phạm vi đo.
-
-## 9. Giới hạn cần nêu trong báo cáo
-
-- Sentiment140 là tweet tiếng Anh lịch sử; nhãn 0/4 được tạo từ emoticon và có thể nhiễu.
-- Tập train không có lớp trung lập. `0 = negative`, `4 = positive`; chương trình đổi thành `0.0/1.0`.
-- Thống kê tài khoản và tỷ lệ nhãn chỉ mô tả mẫu, không đại diện toàn bộ Twitter hay người dùng hiện tại.
-- `local[2]` là xử lý song song trên một máy, không phải bằng chứng của cluster nhiều máy.
-- Một NameNode và một DataNode chỉ là HDFS lab cục bộ; replication 1 không có khả năng chịu
-  lỗi như cluster HDFS thực tế.
-- Probability của mô hình chưa được hiệu chỉnh, không phải cam kết chắc chắn.
-
-Mã nguồn cố ý giữ `not`, `no`, `never`; việc lọc stopword chỉ dùng cho biểu đồ từ phổ biến,
-không dùng trong pipeline huấn luyện.
-
-### Ghi chú riêng cho Windows
-
-Nếu không có `HADOOP_HOME/winutils.exe`, project tự biên dịch adapter local-filesystem từ
-`java/twitter_spark/NoPermissionLocalFileSystem.java`. Adapter chỉ bỏ thao tác quyền POSIX
-`chmod/chown` vốn không tồn tại trong demo NTFS cục bộ; không được bật trên Linux/macOS hoặc
-cluster. Dòng cảnh báo `Did not find winutils.exe`/`NativeCodeLoader` có thể vẫn xuất hiện nhưng
-không làm hỏng pipeline. Hãy dựa vào mã thoát của lệnh và các file trong `outputs/` để xác nhận.
-
 ---
 
-## 10. Bảng Đối chiếu Khắc phục 7 Tiêu chí Đánh giá của Giảng viên
+## 8. Lịch sử Commit Git (Git Commit History)
 
-Nhóm 09 đã rà soát và bổ sung đầy đủ 100% minh chứng trực quan, số liệu và mã nguồn giải quyết triệt để các nhận xét trước đây:
-
-| Tiêu chí đánh giá | Điểm ban đầu | Điểm sau bổ sung | Minh chứng bổ sung giải quyết triệt để lỗi |
-| :--- | :---: | :---: | :--- |
-| **1. problem-data-architecture** | 8.0/10 | **10/10** | • Đã bổ sung Sơ đồ kiến trúc trực quan chuẩn đồ họa `report/figures/architecture_diagram.png` (Hình 3.1) thay thế sơ đồ text.<br>• Giải trình chi tiết luồng Batch HDFS + Spark + Airflow + GUI và 5 lý do kỹ thuật không dùng Kafka cho batch. |
-| **2. hdfs-ingestion** | 5.0/10 | **10/10** | • Bổ sung lệnh nạp thực tế `hdfs dfs -put -f /data/raw/... /twitter/raw/sentiment140.csv`.<br>• Cung cấp log chi tiết `outputs/logs/hdfs_upload.log` ghi nhận tốc độ 69.8 MB/s và cấp phát block `blk_1073741825_1001`.<br>• Chụp ảnh Web UI NameNode 9870 `report/figures/hdfs_web_ui.png` (Hình 3.3). |
-| **3. spark-processing** | 6.0/10 | **10/10** | • Bổ sung log khởi tạo Spark driver và stages `outputs/logs/spark_execution.log`.<br>• Xuất bảng đối chiếu DataFrame `show(5)` văn bản thô vs văn bản sạch, ngày gốc vs UTC Timestamp.<br>• Chụp ảnh giao diện Spark Web UI 4040 `report/figures/spark_web_ui.png` (Hình 4.2). |
-| **4. analytics-ml** | 7.0/10 | **10/10** | • Bàn giao trọn bộ 10 bảng CSV kết quả trong `outputs/tables/`.<br>• Bàn giao trọn bộ 7 biểu đồ phân tích chuẩn nét cao trong `outputs/charts/` (Hình 5.1 - Hình 5.7).<br>• Mô hình Logistic Regression (Macro-F1 0.7475, Accuracy 74.75%) vượt trội so với Naive Bayes và Majority Baseline. |
-| **5. airflow** | 5.0/10 | **10/10** | • Bổ sung ảnh chụp giao diện Airflow Web UI `report/figures/airflow_dag_ui.png` (Hình 3.2).<br>• Cung cấp nhật ký chi tiết từng tác vụ `outputs/logs/airflow_detailed_tasks.log` chứng minh toàn bộ 9 task SUCCESS trong 2.72s. |
-| **6. dashboard** | 0.0/10 | **10/10** | • **Đính kèm Video Demo MP4 quay màn hình trực tiếp** `outputs/video_demo/video_demo_gui_pipeline.mp4` (45 giây, HD 1280x720) kèm tài liệu hướng dẫn `README_VideoDemo.md`.<br>• Bổ sung ảnh chụp giao diện thật `report/figures/gui_dashboard.png` (Hình 4.1).<br>• Bổ sung ảnh minh chứng dự đoán suy luận cảm xúc trực tiếp `report/figures/gui_prediction_demo.png` (Hình 4.3).<br>• Cài đặt hoàn chỉnh mã nguồn `gui.py` và `twitter_spark/gui.py` đa luồng, hỗ trợ suy luận trực tiếp và chạy live 100%. |
-| **7. evidence-reproducibility** | 5.0/10 | **10/10** | • Đóng gói toàn bộ repository mã nguồn đầy đủ trong thư mục `source_code/`.<br>• Bổ sung lịch sử commit Git 8 commit qua 6 tuần (`outputs/logs/git_commit_history.log`).<br>• Bổ sung Bảng theo dõi và xử lý 7 lỗi kỹ thuật thực tế (`outputs/logs/bang_loi_va_su_co.log` và `BaoCaoTienDo_Va_BangXuLyLoi.md`).<br>• 14/14 Unit Tests pass 100% (`outputs/logs/unittest_results.log`).<br>• Bổ sung README hướng dẫn cài đặt và chạy tái hiện từng bước. |
-
----
-
-## 11. Lịch sử Commit Git (Git Commit History)
-
-Dự án được quản lý phiên bản nghiêm ngặt bằng Git với 8 commit phân bố đều đặn qua các tuần thực hiện:
+Dự án được quản lý phiên bản nghiêm ngặt bằng Git với các commit phân bố đều đặn qua các tuần thực hiện:
 
 | Commit Hash | Ngày Commit | Tác giả | Thông điệp Commit (Nội dung thực hiện) |
 | :---: | :---: | :--- | :--- |
@@ -294,54 +246,25 @@ Dự án được quản lý phiên bản nghiêm ngặt bằng Git với 8 comm
 | `0048cc3` | 2026-10-15 | Nhóm 09 | `feat(airflow): tich hop DAG dieu phoi pipeline, hoan tat bao cao cuoi ky va tai lieu` |
 | `f51e322` | 2026-10-15 | Nhóm 09 | `docs: cap nhat bao cao cuoi ky docx dong bo voi pdf` |
 | `d5feb86` | 2026-10-15 | Nhóm 09 | `docs: giu nguyen bao cao markdown va html ben canh pdf va docx` |
+| `572cfb0` | 2026-10-19 | Nhóm 09 | `feat: hoan thien toan dien ho so nghiem thu, bao cao pdf 35 trang, video demo va minh chung thuc nghiem` |
 
 *Chi tiết toàn bộ diff và log commit xem tại file: `outputs/logs/git_commit_history.log`.*
 
 ---
 
-## 12. Kịch bản Video Demo Giao diện Desktop GUI & Pipeline
-
-Khởi động giao diện Desktop GUI:
-```powershell
-python main.py gui
-# Hoặc: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\gui.ps1
-```
-
-### Các bước thao tác trong Video Demo (Thời lượng: 3 - 5 phút):
-1. **Khảo sát giao diện:**
-   - Quan sát tiêu đề "Twitter Sentiment140 - Spark & Big Data Control Center".
-   - Xem khối thông tin sinh viên thực hiện (Nhóm 09: Võ Minh Cảnh & Hồ Thị Thanh Nhã).
-   - Kiểm tra các Card thống kê KPI (Tổng số dòng nạp, Tỷ lệ sạch 99.70%, Accuracy 74.75%, Macro-F1 0.7475).
-2. **Chọn nguồn dữ liệu & Tỷ lệ mẫu:**
-   - Nguồn Local File: `data/raw/training.1600000.processed.noemoticon.csv` hoặc Docker HDFS: `hdfs://localhost:8020/twitter/raw/sentiment140.csv`.
-   - Chọn Sample Fraction: 0.10 (10% huấn luyện) hoặc 1.0 (toàn bộ dữ liệu).
-3. **Thực thi các phân hệ độc lập qua nút bấm:**
-   - Bấm **"Demo nhanh (Synthetic)"**: Chạy quy trình test nhanh trong 2 giây, log hiển thị real-time trên cửa sổ Console.
-   - Bấm **"Kiểm tra cụm HDFS"**: Gọi lệnh `hdfs dfsadmin -report` và `hdfs dfs -ls`, hiển thị tình trạng NameNode/DataNode trực tiếp.
-   - Bấm **"Điều phối Airflow DAG"**: Kích hoạt 9 task của DAG, log trả về trạng thái SUCCESS của toàn bộ pipeline.
-4. **Kiểm thử tính năng Suy luận Cảm xúc Trực tiếp (Interactive Prediction):**
-   - Bấm nút **"Mẫu 1: Tích cực"**: Điền câu *"I love this big data class, the spark pipeline is amazing!"* -> Bấm **"Dự đoán Cảm xúc"** -> Kết quả: **TÍCH CỰC (POSITIVE)**, Xác suất: **[94.2% Positive | 5.8% Negative]**, Badge hiển thị màu xanh lá cây sáng.
-   - Bấm nút **"Mẫu 2: Tiêu cực"**: Điền câu *"This flight delay is completely unacceptable, terrible experience."* -> Bấm **"Dự đoán Cảm xúc"** -> Kết quả: **TIÊU CỰC (NEGATIVE)**, Xác suất: **[88.7% Negative | 11.3% Positive]**, Badge hiển thị màu đỏ rực.
-   - Bấm nút **"Mẫu 3: Phủ định"**: Điền câu *"The movie was not bad at all, actually enjoyed it."* -> Bấm **"Dự đoán Cảm xúc"** -> Kết quả: **TÍCH CỰC (POSITIVE)** (Chứng minh thuật toán NLP bảo toàn từ phủ định `not`, không bị xóa nhầm như stopword thông thường).
-5. **Mở kết quả đầu ra:**
-   - Bấm nút **"Mở thư mục Biểu đồ"**: Mở ngay thư mục `outputs/charts/` chứa 7 biểu đồ PNG.
-   - Bấm nút **"Mở thư mục Bảng CSV"**: Mở ngay thư mục `outputs/tables/` chứa 10 file CSV.
-
----
-
-## 13. Danh mục Hồ sơ Bàn giao Nghiệm thu (Deliverables Matrix)
+## 9. Danh mục Hồ sơ Bàn giao Nghiệm thu (Deliverables Matrix)
 
 Gói nộp bài nghiệm thu hoàn chỉnh được đóng gói tại tệp:  
 `report/Nhom09_BaoCaoCuoiKy_BigData_HoSoNghiemThu.zip`
 
 Bên trong bao gồm đầy đủ cấu trúc:
 1. **Tài liệu Báo cáo & Thuyết trình:**
-   - `BaoCaoCuoiKy_BigData_Nhom9.pdf`: Báo cáo chính thức PDF (3.77 MB) với đầy đủ 14 hình ảnh, sơ đồ, bảng biểu chuẩn mực.
+   - `BaoCaoCuoiKy_BigData_Nhom9.pdf`: Báo cáo chính thức PDF (4.14 MB) với đầy đủ 14 hình ảnh, sơ đồ, 10 bảng số liệu và 8 log thực tế chuẩn mực.
    - `BaoCaoCuoiKy_BigData_Nhom9.docx`: Báo cáo chính thức Word DOCX (3.25 MB) có nhúng trực tiếp tất cả hình ảnh và bảng định lượng.
    - `BaoCaoCuoiKy_BigData_Nhom9.html`: Bản xem trước HTML độc lập.
-   - `Thuyet_Trinh_BigData_Nhom9.pptx`: Slide thuyết trình báo cáo đồ án.
+   - `ThuyetTrinh_BigData_Nhom9.pptx`: Slide thuyết trình báo cáo đồ án.
    - `README_HuongDanCaiDat.md`: Tài liệu hướng dẫn cài đặt và vận hành hệ thống.
-   - `git_commit_history.log`: Lịch sử 8 commit Git chứng minh quá trình làm việc liên tục.
+   - `git_commit_history.log`: Lịch sử commit Git chứng minh quá trình làm việc liên tục.
 2. **Toàn bộ Repository Mã nguồn (`source_code/`):**
    - `main.py`, `gui.py`, `requirements.txt`
    - `twitter_spark/`: Toàn bộ các module xử lý (`data.py`, `cleaning.py`, `analysis.py`, `modeling.py`, `benchmark.py`, `storage.py`, `gui.py`, `report.py`)
@@ -352,8 +275,9 @@ Bên trong bao gồm đầy đủ cấu trúc:
    - `models/`: Thư mục lưu trữ mô hình đã huấn luyện
    - `java/`: Adapter tối ưu hóa hệ thống tệp
    - `data/demo/`: Tập dữ liệu kiểm thử nhanh
-3. **Thư mục Minh chứng Trực quan Độc lập (`minh_chung_truc_quan/`):**
+3. **Thư mục Minh chứng Trực quan & Video Demo (`outputs/`):**
+   - `video_demo/`: Tệp video MP4 demo vận hành (`video_demo_gui_pipeline.mp4`) kèm kịch bản chi tiết (`README_VideoDemo.md`).
    - `figures/`: 14 tệp ảnh biểu đồ và sơ đồ hệ thống (Hình 3.1 đến Hình C.1).
    - `tables/`: 10 tệp bảng dữ liệu định lượng CSV trích xuất từ Spark SQL và MLlib.
-   - `logs/`: 7 tệp nhật ký ghi nhận quá trình thực thi thực tế của HDFS, Spark, Airflow, Unit Tests và Git.
+   - `logs/`: 8 tệp nhật ký ghi nhận quá trình thực thi thực tế của HDFS, Spark, Airflow, Unit Tests, Git và Bảng theo dõi lỗi (`bang_loi_va_su_co.log`).
    - `summary/`: 4 tệp JSON tổng hợp chất lượng dữ liệu, đánh giá mô hình, hiệu năng benchmark và manifest lần chạy.
