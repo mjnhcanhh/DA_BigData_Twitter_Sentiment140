@@ -39,6 +39,10 @@
 
 **Hình 0.1. Bảng tổng hợp minh chứng trực quan 4 thành phần hệ thống Big Data (Kiến trúc 4 tầng, Spark UI 5 Jobs Succeeded, Airflow UI 9 tasks Success, HDFS Web UI và Desktop GUI).**
 
+![Hình 0.2. Bảng tổng hợp minh chứng thực nghiệm mô hình MLlib & Giao diện (Ma trận nhầm lẫn, Benchmark, GUI live predictor và Gantt Chart)](figures/ml_and_results_gallery.png)
+
+**Hình 0.2. Bảng tổng hợp minh chứng thực nghiệm mô hình MLlib & Giao diện (Ma trận nhầm lẫn Acc 74.75%, Benchmark hiệu năng, Suy luận trực tiếp GUI và Sơ đồ Gantt tiến độ 6 tuần).**
+
 ---
 
 ## BẢNG ĐỐI CHIẾU KHẮC PHỤC 7 TIÊU CHÍ ĐÁNH GIÁ CỦA GIẢNG VIÊN

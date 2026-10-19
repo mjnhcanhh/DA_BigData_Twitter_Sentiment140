@@ -417,6 +417,15 @@ def build_complete_html(content_html: str) -> str:
 
 
 def generate_pdf():
+    # Đồng bộ toàn bộ ảnh từ figures/ sang report/figures/
+    report_fig_dir = PROJECT_ROOT / "report" / "figures"
+    report_fig_dir.mkdir(parents=True, exist_ok=True)
+    root_fig_dir = PROJECT_ROOT / "figures"
+    if root_fig_dir.exists():
+        import shutil
+        for f in root_fig_dir.glob("*.png"):
+            shutil.copy2(f, report_fig_dir / f.name)
+
     print(f"Đọc nội dung báo cáo từ: {MD_PATH}")
     md_text = MD_PATH.read_text(encoding="utf-8")
     
