@@ -95,6 +95,8 @@ TF-IDF, Logistic Regression, HDFS.
 
 ## DANH MỤC HÌNH
 
+- Hình 0.1. Bảng tổng hợp minh chứng trực quan 4 thành phần hệ thống Big Data (Kiến trúc, Spark UI, Airflow UI, HDFS UI & GUI).
+- Hình 0.2. Bảng tổng hợp minh chứng thực nghiệm mô hình MLlib & Giao diện (Ma trận nhầm lẫn, Benchmark, GUI live predictor và Gantt Chart).
 - Hình 3.1. Kiến trúc tổng thể của hệ thống Big Data.
 - Hình 3.2. Sơ đồ điều phối luồng DAG Apache Airflow thực tế (Graph View).
 - Hình 3.3. Giao diện Quản trị Cụm Hadoop HDFS Web UI (Port 9870) và Thư mục dữ liệu.
@@ -129,6 +131,7 @@ TF-IDF, Logistic Regression, HDFS.
 - Bảng 5.2c. Phân bố tần suất bài đăng trên mỗi tài khoản người dùng (posts_per_user_distribution.csv).
 - Bảng 5.2d. Top 15 từ vựng xuất hiện nhiều nhất theo từng nhãn cảm xúc (top_words_by_label.csv).
 - Bảng 5.3. Kết quả so sánh mô hình (Baseline, Naive Bayes, Logistic Regression).
+- Bảng 5.3b. Ma trận nhầm lẫn (Confusion Matrix) chi tiết trên 22,812 mẫu kiểm thử (Test Set).
 - Bảng 5.4. Kết quả benchmark 3 quy mô Uncached vs Cached (performance.csv).
 - Bảng 5.4a. Kết quả tìm kiếm siêu tham số trên tập Validation (validation_results.csv).
 - Bảng 5.4b. Phân tích một số mẫu dự đoán sai điển hình trên tập Test (misclassified_examples.csv).
